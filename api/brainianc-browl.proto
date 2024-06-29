@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package api;
+
+
+option go_package = "github.com/chinmayb/brainiac-brawl/api;pb";
+
+import "google/protobuf/timestamp.proto";
+
+
+// Interface exported by the game server.
+service BrainiacBrawl {
+
+  // A Bidirectional streaming gameplay.
+  //
+  // Accepts a stream of GamePlay while a game is being played,
+  // while receiving other GamePlay (e.g. from other users).
+  rpc Play(stream GamePlay) returns (stream GamePlay) {}
+}
+
+// Gameplay command contains the actual answer to the question. And server returns
+// the result of the answer.
+message GamePlayCommand {
+    // id
+    string id = 1;
+
+    // answer given by the player
+    string player_answer  = 2;
+
+    // question
+    string question = 3;
+
+    // actual answer
+    string correct_answer  = 4;
+
+    // timestamp question was asked
+    google.protobuf.Timestamp question_time= 5;
+}
+
+// Player is a game player
+message Player {
+   string id = 1;
+   int32 score= 2;
+   string name = 3;
+   bool is_bot = 4;
+   PlayerStatus status = 5;
+}
+
+// GameSummary is a message sent after the game is over
+message GameSummary {
+  string id = 1;
+  repeated Player players = 2;
+  Player winner= 3;
+  bool is_over= 4;
+}
+
+// playerStatus status
+enum PlayerStatus {
+    PLAYING = 0;
+    WAITING = 1;
+    DISCONNECTED = 2;
+}
+
+
+// GamePlayStatus status
+enum GamePlayStatus {
+    ON_GOING = 0;
+    GAME_OVER = 1;
+    NOT_STARTED = 2;
+}
+
+
+// A GamePlay is a message sent while playing
+message GamePlay {
+  string id  = 1;
+  string code  = 2;
+  Player player = 3;
+  GamePlayStatus status = 4;
+  oneof cmd{
+        GameSummary summary = 5;
+        GamePlayCommand command = 6;
+      }
+}
