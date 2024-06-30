@@ -24,6 +24,8 @@ message GamePlayCommand {
     // id
     string id = 1;
 
+    // 
+
     // answer given by the player
     string player_answer  = 2;
 
@@ -46,12 +48,12 @@ message Player {
    PlayerStatus status = 5;
 }
 
-// GameSummary is a message sent after the game is over
+// GameSummary is a message sent after the game is over or
+// if the game is not started
 message GameSummary {
-  string id = 1;
-  repeated Player players = 2;
-  Player winner= 3;
-  bool is_over= 4;
+  repeated Player players = 1;
+  Player winner= 2;
+  GamePlayStatus status = 3;
 }
 
 // playerStatus status
@@ -69,15 +71,22 @@ enum GamePlayStatus {
     NOT_STARTED = 2;
 }
 
+// GamePlayAction defines the action the host can peform, he can begin
+// or end the game
+enum GamePlayAction {
+    BEGIN = 0;
+    END = 1;
+}
+
 
 // A GamePlay is a message sent while playing
 message GamePlay {
   string id  = 1;
   string code  = 2;
   Player player = 3;
-  GamePlayStatus status = 4;
   oneof cmd{
-        GameSummary summary = 5;
-        GamePlayCommand command = 6;
+        GamePlayAction action = 4;
+        GameSummary summary = 6;
+        GamePlayCommand command = 7;
       }
 }
