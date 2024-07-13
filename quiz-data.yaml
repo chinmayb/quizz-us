@@ -1,0 +1,49 @@
+- question: "What is the capital of France?"
+  answer: "Paris"
+  imageSrc: "http://example.com/images/paris.jpg"
+  tags: ["geography", "capital cities", "Europe"]
+
+- question: "What is the chemical symbol for water?"
+  answer: "H2O"
+  imageSrc: "http://example.com/images/water.jpg"
+  tags: ["science", "chemistry", "symbols"]
+
+- question: "Who wrote 'To Kill a Mockingbird'?"
+  answer: "Harper Lee"
+  imageSrc: "http://example.com/images/to_kill_a_mockingbird.jpg"
+  tags: ["literature", "books", "authors"]
+
+- question: "What is the largest planet in our solar system?"
+  answer: "Jupiter"
+  imageSrc: "http://example.com/images/jupiter.jpg"
+  tags: ["science", "astronomy", "planets"]
+
+- question: "In which year did the Titanic sink?"
+  answer: "1912"
+  imageSrc: "http://example.com/images/titanic.jpg"
+  tags: ["history", "events", "ships"]
+
+- question: "What is the square root of 64?"
+  answer: "8"
+  imageSrc: "http://example.com/images/math.jpg"
+  tags: ["math", "numbers", "arithmetic"]
+
+- question: "Who painted the Mona Lisa?"
+  answer: "Leonardo da Vinci"
+  imageSrc: "http://example.com/images/mona_lisa.jpg"
+  tags: ["art", "paintings", "artists"]
+
+- question: "What is the longest river in the world?"
+  answer: "Nile"
+  imageSrc: "http://example.com/images/nile.jpg"
+  tags: ["geography", "rivers", "world"]
+
+- question: "What is the primary ingredient in guacamole?"
+  answer: "Avocado"
+  imageSrc: "http://example.com/images/guacamole.jpg"
+  tags: ["food", "cooking", "ingredients"]
+
+- question: "Who discovered penicillin?"
+  answer: "Alexander Fleming"
+  imageSrc: "http://example.com/images/penicillin.jpg"
+  tags: ["science", "medicine", "discoveries"]
