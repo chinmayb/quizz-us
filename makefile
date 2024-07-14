@@ -4,3 +4,7 @@ run:
 
 buf:
 	buf generate
+
+fmt:
+	go fmt ./...
+	buf format -w

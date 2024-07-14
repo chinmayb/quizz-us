@@ -2,15 +2,82 @@ syntax = "proto3";
 
 package api;
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/chinmayb/brainiac-brawl/api;pb";
 
-import "google/protobuf/timestamp.proto";
+// Game is an object which represents the type of the games we do support at
+// the global level
+message GameKind {
+  string id = 1;
+  // kind of the Game for e.g. jklm, ludo etc
+  string kind = 2;
+  string name = 3;
+  // data_location is the authorized url endpoint where you can access the data
+  string data_location = 4;
+}
 
+// A Game  is a message sent while playing
+message Game {
+  message Spec {
+    // duration of the question
+    google.protobuf.Duration question_duration = 1;
+    int32 target_score = 2;
+    google.protobuf.Duration target_time = 3;
+  }
+  string id = 1;
+  string game_kind_id = 2;
+  // unique code of the game instance which can be used to join the game by
+  // player
+  string code = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  string result = 6;
+  string status = 7;
+  Spec spec = 8;
+}
+
+// Player is a game player
+message Player {
+  string id = 1;
+  int32 score = 2;
+  string name = 3;
+  bool is_bot = 4;
+  PlayerStatus status = 5;
+}
+
+// GameSummary is a message sent after the game is over or
+// if the game is not started
+message GameSummary {
+  repeated Player players = 1;
+  Player winner = 2;
+  GamePlayStatus status = 3;
+}
+
+// playerStatus status
+enum PlayerStatus {
+  PLAYING = 0;
+  WAITING = 1;
+  DISCONNECTED = 2;
+}
+
+// GamePlayStatus status
+enum GamePlayStatus {
+  ON_GOING = 0;
+  GAME_OVER = 1;
+  NOT_STARTED = 2;
+}
+
+// GamePlayAction defines the action the host can peform, he can begin
+// or end the game
+enum GamePlayAction {
+  BEGIN = 0;
+  END = 1;
+}
 
 // Interface exported by the game server.
-service BrainiacBrawl {
-
+service Games {
   // A Bidirectional streaming gameplay.
   //
   // Accepts a stream of GamePlay while a game is being played,
@@ -21,72 +88,30 @@ service BrainiacBrawl {
 // Gameplay command contains the actual answer to the question. And server returns
 // the result of the answer.
 message GamePlayCommand {
-    // id
-    string id = 1;
+  // id
+  string id = 1;
 
-    // 
+  // answer given by the player
+  string player_answer = 2;
 
-    // answer given by the player
-    string player_answer  = 2;
+  // question
+  string question = 3;
 
-    // question
-    string question = 3;
+  // actual answer
+  string correct_answer = 4;
 
-    // actual answer
-    string correct_answer  = 4;
-
-    // timestamp question was asked
-    google.protobuf.Timestamp question_time= 5;
+  // timestamp question was asked
+  google.protobuf.Timestamp question_time = 5;
 }
 
-// Player is a game player
-message Player {
-   string id = 1;
-   int32 score= 2;
-   string name = 3;
-   bool is_bot = 4;
-   PlayerStatus status = 5;
-}
-
-// GameSummary is a message sent after the game is over or
-// if the game is not started
-message GameSummary {
-  repeated Player players = 1;
-  Player winner= 2;
-  GamePlayStatus status = 3;
-}
-
-// playerStatus status
-enum PlayerStatus {
-    PLAYING = 0;
-    WAITING = 1;
-    DISCONNECTED = 2;
-}
-
-
-// GamePlayStatus status
-enum GamePlayStatus {
-    ON_GOING = 0;
-    GAME_OVER = 1;
-    NOT_STARTED = 2;
-}
-
-// GamePlayAction defines the action the host can peform, he can begin
-// or end the game
-enum GamePlayAction {
-    BEGIN = 0;
-    END = 1;
-}
-
-
-// A GamePlay is a message sent while playing
 message GamePlay {
-  string id  = 1;
-  string code  = 2;
-  Player player = 3;
-  oneof cmd{
-        GamePlayAction action = 4;
-        GameSummary summary = 6;
-        GamePlayCommand command = 7;
-      }
+  string id = 1;
+
+  string code = 2;
+
+  oneof cmd {
+    GamePlayAction action = 3;
+    GameSummary summary = 4;
+    GamePlayCommand command = 5;
+  }
 }
