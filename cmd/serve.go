@@ -10,6 +10,7 @@ import (
 	"os"
 
 	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
+	"github.com/chinmayb/brainiac-brawl/pkg/data"
 	"github.com/chinmayb/brainiac-brawl/pkg/play"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -27,6 +28,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := data.ParseQuizData("./quiz-data.yaml"); err != nil {
+			log.Error("error parsing data", err)
+			os.Exit(1)
+		}
+		log.Info("server is running...")
 		spawnServer(cmd)
 	},
 }
@@ -51,13 +57,12 @@ func spawnServer(cmd *cobra.Command) {
 	port := pflag.Int("port", 8080, "port")
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
 	if err != nil {
-		log.Error("errr", err)
+		log.Error("err listening", err)
 		os.Exit(1)
 	}
 	logger := log.New(log.NewTextHandler(os.Stdout, nil))
-	fmt.Print(logger)
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterBrainiacBrawlServer(grpcServer, play.NewPlayServer())
+	pb.RegisterGamesServer(grpcServer, play.NewPlayServer(logger))
 	grpcServer.Serve(lis)
 }
