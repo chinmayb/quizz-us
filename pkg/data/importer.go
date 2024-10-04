@@ -14,6 +14,7 @@ type QuizData struct {
 	Answer   string   `yaml:answer`
 	ImageSrc *url.URL `yaml:imageSrc`
 	Tags     []string `yaml:tags`
+	Hints    []string `yaml:hints`
 }
 
 // RefinedQUizdata groups by tags and serial

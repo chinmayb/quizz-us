@@ -1,6 +1,9 @@
 
-run:
-	go run main.go serve
+server:
+	@go run main.go serve
+
+run-client:
+	@go run main.go client
 
 buf:
 	buf generate
