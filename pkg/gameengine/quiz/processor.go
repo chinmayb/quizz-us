@@ -3,7 +3,7 @@ package quiz
 import (
 	"context"
 	"fmt"
-	"log"
+	log "log/slog"
 	"sync"
 	"time"
 
@@ -71,6 +71,20 @@ func GetPlayer(code string, playerID string) (*PlayerObj, error) {
 	return playerChan, nil
 }
 
+func RemoveGame(gameID string) {
+	GameRegistry.mu.Lock()
+	defer GameRegistry.mu.Unlock()
+
+	delete(GameRegistry.games, gameID)
+}
+
+func RemovePlayerFromRegistry(gameID string, playerID string) {
+	GameRegistry.mu.Lock()
+	defer GameRegistry.mu.Unlock()
+
+	delete(GameRegistry.games[gameID].players, playerID)
+}
+
 func AddPlayerToRegistry(gameID string, playerObj *PlayerObj) {
 	if playerObj == nil {
 		return
@@ -78,30 +92,27 @@ func AddPlayerToRegistry(gameID string, playerObj *PlayerObj) {
 	GameRegistry.mu.Lock()
 	defer GameRegistry.mu.Unlock()
 
-	playermap := make(map[string]*PlayerObj)
-
-	playermap[playerObj.Player.Id] = playerObj
-	if _, ok := GameRegistry.games[gameID]; !ok {
-		return
+	if game, ok := GameRegistry.games[gameID]; ok {
+		game.players[playerObj.Player.Id] = playerObj
 	}
-	// TODO introduce
-	GameRegistry.games[gameID].players = playermap
 }
 
-func AddGame(gameID string, processor *Game) {
+func AddGame(gameID string, processor *Game) (exists bool) {
 	GameRegistry.mu.Lock()
 	defer GameRegistry.mu.Unlock()
 
 	if processor == nil {
-		return
+		return !exists
 	}
 
 	// nothing to do if already exists
 	if _, ok := GameRegistry.games[gameID]; ok {
-		return
+		return true
 	}
 
+	log.Debug("initializing game: ", "code", gameID)
 	GameRegistry.games[gameID] = processor
+	return false
 }
 
 // PlayerObj player obj
@@ -140,7 +151,7 @@ type gameProcessor struct {
 }
 
 func (g *Game) Process(ctx context.Context) error {
-
+	log.Info("Game processor started")
 	for {
 		select {
 		// TODO crashes needs to be handled from a reconciler if a game is running & stuck for a while
@@ -149,11 +160,12 @@ func (g *Game) Process(ctx context.Context) error {
 			if p, ok := GetGame(gameObj.Code); !ok {
 				return fmt.Errorf("no playing registry found")
 			} else {
-				fmt.Printf("Processor %#v", p)
+				log.Info("Processor", "object", p)
 			}
 			g.Play(ctx, gameObj.Code)
 
 		case <-ctx.Done():
+			log.Info("context done in game processor")
 			return nil
 		}
 	}
@@ -164,27 +176,31 @@ func (g *Game) Play(ctx context.Context, code string) error {
 	// read it from db
 	ticker := time.NewTicker(time.Second * 30)
 	quizengine := NewQuizEnginer()
-	log.Printf("begining game")
+	time.Sleep(1 * time.Second)
+	log.Debug("Begining game")
 	if err := broadCastQuestion(ctx, code, quizengine); err != nil {
 		return err
 	}
 	for {
 		select {
 		case <-ticker.C:
-			log.Printf("sending the next question")
+			log.Info("sending the next question")
 			if err := broadCastQuestion(ctx, code, quizengine); err != nil {
 				return err
 			}
 
 		// Every player will post the answer to this channel, the player details are in the object
 		case playerobj := <-g.GamePro.AnswerChan:
-			log.Printf("received answer from %s", playerobj.Player.Name)
+			log.Info("received", "answer", playerobj.AnswerFromPlayer, "player", playerobj.Player)
 			if !quizengine.ValidateAnswer(ctx, playerobj.AnswerFromPlayer) {
-				log.Printf("wrong answer")
+				log.Info("Wrong answer")
 				continue
 			}
+			log.Info("Right answer")
 			// TODO update the score in the DB
+			// add a logic to give more points for faster answers
 			playerobj.Player.Score++
+			// TODO notify all the players that they one player has answered the question
 			// TODO check if all answered right if so send it to that channel
 			//
 
@@ -199,7 +215,7 @@ func (g *Game) Play(ctx context.Context, code string) error {
 				return err
 			}
 		case <-ctx.Done():
-			log.Printf("context done")
+			log.Info("context done")
 			return nil
 		}
 	}
@@ -215,13 +231,14 @@ func broadCastQuestion(ctx context.Context, code string, q QuizEnginer) error {
 	for _, player := range players {
 		// fan out the quiz questions to players
 		go func() {
+			log.Debug("sending question to", "player", player.Player.Id)
 			player.QuestionForPlayer <- data
 		}()
 	}
 	return nil
 }
 
-func broadCastResult(ctx context.Context, code string, q QuizEnginer) error {
+func broadCastResult(_ context.Context, code string, q QuizEnginer) error {
 	players, _ := GetAllPlayers(code)
 
 	// TODO add result from DB
