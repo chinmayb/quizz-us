@@ -4,12 +4,13 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strconv"
 
 	"gopkg.in/yaml.v2"
 )
 
 type QuizData struct {
-	Id       int32
+	Id       string
 	Question string   `yaml:question`
 	Answer   string   `yaml:answer`
 	ImageSrc *url.URL `yaml:imageSrc`
@@ -29,13 +30,13 @@ type QuizData struct {
 //
 // &
 // {"political": [1,100,12], "sports": [2,5,100]}
-var QuizDataByTag map[string][]int32
-var QuizDataRefined map[int32]QuizData
+var QuizDataByTag map[string][]string
+var QuizDataRefined map[string]QuizData
 
 func PopulateRefinedData(quizData []QuizData) {
 	// populate by tags
-	QuizDataByTag = make(map[string][]int32)
-	QuizDataRefined = make(map[int32]QuizData)
+	QuizDataByTag = make(map[string][]string)
+	QuizDataRefined = make(map[string]QuizData)
 	for _, data := range quizData {
 		for _, tag := range data.Tags {
 			QuizDataByTag[tag] = append(QuizDataByTag[tag], data.Id)
@@ -51,7 +52,7 @@ func PopulateRefinedData(quizData []QuizData) {
 			}
 			quizData[i].ImageSrc = parsedURL
 		}
-		quiz.Id = int32(i + 1)
+		quiz.Id = strconv.Itoa(i + 1)
 		QuizDataRefined[quiz.Id] = quiz
 	}
 }

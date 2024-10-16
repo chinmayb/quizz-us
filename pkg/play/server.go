@@ -23,13 +23,15 @@ type PlayServer struct {
 }
 
 func initGame(ctx context.Context, code string) {
-	log.Info("initializing game: ", "code", code)
 	gameChan := make(chan quiz.GamePro)
 	ansChan := make(chan quiz.PlayerObj)
 	p := quiz.NewGameProcessor(gameChan, ansChan)
 
 	// ADD it to the in memory registry
-	quiz.AddGame(code, p)
+	if alreadyExists := quiz.AddGame(code, p); alreadyExists {
+		log.Warn("game already exists", "gameID", code)
+		return
+	}
 
 	// should start only once
 	go p.Process(ctx)
@@ -64,7 +66,6 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			return err
 		}
 		// check incoming request if the id exists during join or reconnection
-		// in.GetCode()
 
 		code := in.GetCode()
 		if code == "" {
@@ -74,8 +75,8 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			return fmt.Errorf("player ID not found")
 		}
 		log := p.log.With("gameID", code)
-
-		// TODO check if client is exited if n heartbeat missed
+		log.Info("Received request", "request", in)
+		// TODO check if client is exited if n heartbeats missed
 		if in.GetAction() == pb.GamePlayAction_HEARTBEAT {
 			_, ok := quiz.GetGame(code)
 			if !ok {
@@ -88,33 +89,30 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 		if in.GetAction() == pb.GamePlayAction_JOIN {
 			// shouldnt send the same
 			log.Info("Player joined", "player", in.GetId())
+			// TODO only host can initialize the game
 			initGame(stream.Context(), in.GetCode())
 			playObj.Player.Id = in.GetId()
 
 			quiz.AddPlayerToRegistry(code, playObj)
-
-			pl, err := quiz.GetPlayer(code, in.GetId())
-			if err != nil {
-				return err
-			}
 			// waiting for the question/result & send it to player
 			// should happen only once when the player joins
 			go func() {
 				for {
 					select {
-					case quizQuestion := <-pl.QuestionForPlayer:
-						log.Info("Sending question to player")
+					case quizQuestion := <-playObj.QuestionForPlayer:
+						log.Info("Sending question to player", "player", playObj.Player.Id)
 						out := &pb.GamePlay{
 							Cmd: &pb.GamePlay_Command{Command: &pb.GamePlayCommand{
+								Id:            quizQuestion.Id,
 								Question:      quizQuestion.Question,
 								CorrectAnswer: quizQuestion.Answer,
-							},
-							}}
+							}},
+						}
 						if err := stream.Send(out); err != nil {
-							log.Error("error sending question", err)
+							log.Error("error while sending question", "err", err)
 							return
 						}
-					case result := <-pl.Result:
+					case result := <-playObj.Result:
 						out := &pb.GamePlay{
 							Cmd: &pb.GamePlay_Summary{Summary: result},
 						}
@@ -131,7 +129,20 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 							return
 						}
 					case <-stream.Context().Done():
-						log.Info("client exiting")
+						log.Info("player exited", "ID", in.GetId())
+						// remove the player from the registry
+						quiz.RemovePlayerFromRegistry(code, playObj.Player.Id)
+
+						players, err := quiz.GetAllPlayers(code)
+						if err != nil {
+							return
+						}
+						log.Info("game registry", "players", players)
+						// check if all players are left (TODO add some timeout)
+						if len(players) == 0 {
+							log.Info("no players left, removing the game")
+							quiz.RemoveGame(code)
+						}
 						return
 					}
 				}
@@ -155,9 +166,9 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			// send the answer to processor queue
 
 			p := quiz.PlayerObj{
-				Player:            &pb.Player{Id: in.GetCommand().Id},
-				QuestionForPlayer: nil,
+				Player: &pb.Player{Id: in.GetId()},
 				AnswerFromPlayer: &data.QuizData{
+					Id:     in.GetCommand().GetId(),
 					Answer: in.GetCommand().GetPlayerAnswer(),
 				},
 			}
@@ -166,10 +177,7 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			if !ok {
 				return fmt.Errorf("game ID not found")
 			}
-			fmt.Printf("Processor in sender %#v", proc)
-
 			proc.GamePro.AnswerChan <- p
-			log.Info("sent")
 		}
 	}
 }
