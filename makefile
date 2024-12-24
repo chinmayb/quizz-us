@@ -11,3 +11,7 @@ buf:
 fmt:
 	go fmt ./...
 	buf format -w
+
+vendor:
+	go mod tidy && go mod vendor
+

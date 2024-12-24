@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package api;
 
+import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/chinmayb/brainiac-brawl/api;pb";
+option go_package = "github.com/chinmayb/brainiac-brawl/gen/go/api;api";
 
 // Game is an object which represents the type of the games we do support at
 // the global level
@@ -85,7 +86,9 @@ service Games {
   //
   // Accepts a stream of GamePlay while a game is being played,
   // while receiving other GamePlay (e.g. from other users).
-  rpc Play(stream GamePlay) returns (stream GamePlay) {}
+  rpc Play(stream GamePlay) returns (stream GamePlay) {
+    option (google.api.http) = {post: "/play"};
+  }
 }
 
 // Gameplay command contains the actual answer to the question. And server returns
