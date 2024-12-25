@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: api/brainianc-browl.proto
+// source: api/brainianc-brawl.proto
 
 package api
 
@@ -123,5 +123,5 @@ var Games_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "api/brainianc-browl.proto",
+	Metadata: "api/brainianc-brawl.proto",
 }
