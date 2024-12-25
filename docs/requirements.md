@@ -4,7 +4,6 @@ Its a multiplayer game, where a player can create a game of quizz & share the uR
 Whoever reaches the target score wins.
 
 
-
 Operation
 * Player creates  creates a game
 * choses a or set of categories
@@ -13,7 +12,6 @@ Operation
 * players join the game with the code
 	* If game is not started, just send the empty response
 	* Only host can start the game
-	* 
 
 
 what we want do 

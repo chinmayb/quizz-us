@@ -6,9 +6,15 @@ Platform to host a multiplayer quiz
 Features
 - Upload your own quiz questions
 - Host a multiplayer quiz game
-- Play the game!
+- Play the game with many players!
 
+[Requirements](./docs/requirements.md)
 
-Getting started
-- [Developer guide](./developerGuide.md)
-- [Admin Guide](./admin.md)
+Internals
+- [Engine flows](./docs/engine.md)
+- [Diagram-1](./docs/multiplayerquizz-Page-1.drawio.svg)
+- [Diagram-2](./docs/multiplayerquizz-Page-3-game-handler.drawio.svg)
+
+Getting started(WIP)
+- [Developer guide](./docs/developerGuide.md)
+- [Admin Guide](./docs/admin.md)
