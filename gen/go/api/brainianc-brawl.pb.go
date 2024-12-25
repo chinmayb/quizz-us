@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.1
 // 	protoc        (unknown)
-// source: api/brainianc-browl.proto
+// source: api/brainianc-brawl.proto
 
 package api
 
@@ -57,11 +57,11 @@ func (x PlayerStatus) String() string {
 }
 
 func (PlayerStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_brainianc_browl_proto_enumTypes[0].Descriptor()
+	return file_api_brainianc_brawl_proto_enumTypes[0].Descriptor()
 }
 
 func (PlayerStatus) Type() protoreflect.EnumType {
-	return &file_api_brainianc_browl_proto_enumTypes[0]
+	return &file_api_brainianc_brawl_proto_enumTypes[0]
 }
 
 func (x PlayerStatus) Number() protoreflect.EnumNumber {
@@ -70,7 +70,7 @@ func (x PlayerStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PlayerStatus.Descriptor instead.
 func (PlayerStatus) EnumDescriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{0}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{0}
 }
 
 // GamePlayStatus status
@@ -107,11 +107,11 @@ func (x GamePlayStatus) String() string {
 }
 
 func (GamePlayStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_brainianc_browl_proto_enumTypes[1].Descriptor()
+	return file_api_brainianc_brawl_proto_enumTypes[1].Descriptor()
 }
 
 func (GamePlayStatus) Type() protoreflect.EnumType {
-	return &file_api_brainianc_browl_proto_enumTypes[1]
+	return &file_api_brainianc_brawl_proto_enumTypes[1]
 }
 
 func (x GamePlayStatus) Number() protoreflect.EnumNumber {
@@ -120,7 +120,7 @@ func (x GamePlayStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GamePlayStatus.Descriptor instead.
 func (GamePlayStatus) EnumDescriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{1}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{1}
 }
 
 // GamePlayAction defines the action the host can peform, he can begin
@@ -164,11 +164,11 @@ func (x GamePlayAction) String() string {
 }
 
 func (GamePlayAction) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_brainianc_browl_proto_enumTypes[2].Descriptor()
+	return file_api_brainianc_brawl_proto_enumTypes[2].Descriptor()
 }
 
 func (GamePlayAction) Type() protoreflect.EnumType {
-	return &file_api_brainianc_browl_proto_enumTypes[2]
+	return &file_api_brainianc_brawl_proto_enumTypes[2]
 }
 
 func (x GamePlayAction) Number() protoreflect.EnumNumber {
@@ -177,7 +177,7 @@ func (x GamePlayAction) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GamePlayAction.Descriptor instead.
 func (GamePlayAction) EnumDescriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{2}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{2}
 }
 
 // Game is an object which represents the type of the games we do support at
@@ -196,7 +196,7 @@ type GameKind struct {
 
 func (x *GameKind) Reset() {
 	*x = GameKind{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[0]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -208,7 +208,7 @@ func (x *GameKind) String() string {
 func (*GameKind) ProtoMessage() {}
 
 func (x *GameKind) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[0]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -221,7 +221,7 @@ func (x *GameKind) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameKind.ProtoReflect.Descriptor instead.
 func (*GameKind) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{0}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GameKind) GetId() string {
@@ -271,7 +271,7 @@ type Game struct {
 
 func (x *Game) Reset() {
 	*x = Game{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[1]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -283,7 +283,7 @@ func (x *Game) String() string {
 func (*Game) ProtoMessage() {}
 
 func (x *Game) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[1]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -296,7 +296,7 @@ func (x *Game) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Game.ProtoReflect.Descriptor instead.
 func (*Game) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{1}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Game) GetId() string {
@@ -369,7 +369,7 @@ type Player struct {
 
 func (x *Player) Reset() {
 	*x = Player{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[2]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -381,7 +381,7 @@ func (x *Player) String() string {
 func (*Player) ProtoMessage() {}
 
 func (x *Player) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[2]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -394,7 +394,7 @@ func (x *Player) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Player.ProtoReflect.Descriptor instead.
 func (*Player) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{2}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Player) GetId() string {
@@ -445,7 +445,7 @@ type GameSummary struct {
 
 func (x *GameSummary) Reset() {
 	*x = GameSummary{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[3]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -457,7 +457,7 @@ func (x *GameSummary) String() string {
 func (*GameSummary) ProtoMessage() {}
 
 func (x *GameSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[3]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -470,7 +470,7 @@ func (x *GameSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameSummary.ProtoReflect.Descriptor instead.
 func (*GameSummary) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{3}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GameSummary) GetPlayers() []*Player {
@@ -514,7 +514,7 @@ type GamePlayCommand struct {
 
 func (x *GamePlayCommand) Reset() {
 	*x = GamePlayCommand{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[4]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -526,7 +526,7 @@ func (x *GamePlayCommand) String() string {
 func (*GamePlayCommand) ProtoMessage() {}
 
 func (x *GamePlayCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[4]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -539,7 +539,7 @@ func (x *GamePlayCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GamePlayCommand.ProtoReflect.Descriptor instead.
 func (*GamePlayCommand) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{4}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GamePlayCommand) GetId() string {
@@ -594,7 +594,7 @@ type GamePlay struct {
 
 func (x *GamePlay) Reset() {
 	*x = GamePlay{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[5]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +606,7 @@ func (x *GamePlay) String() string {
 func (*GamePlay) ProtoMessage() {}
 
 func (x *GamePlay) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[5]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +619,7 @@ func (x *GamePlay) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GamePlay.ProtoReflect.Descriptor instead.
 func (*GamePlay) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{5}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GamePlay) GetId() string {
@@ -704,7 +704,7 @@ type Game_Spec struct {
 
 func (x *Game_Spec) Reset() {
 	*x = Game_Spec{}
-	mi := &file_api_brainianc_browl_proto_msgTypes[6]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -716,7 +716,7 @@ func (x *Game_Spec) String() string {
 func (*Game_Spec) ProtoMessage() {}
 
 func (x *Game_Spec) ProtoReflect() protoreflect.Message {
-	mi := &file_api_brainianc_browl_proto_msgTypes[6]
+	mi := &file_api_brainianc_brawl_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -729,7 +729,7 @@ func (x *Game_Spec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Game_Spec.ProtoReflect.Descriptor instead.
 func (*Game_Spec) Descriptor() ([]byte, []int) {
-	return file_api_brainianc_browl_proto_rawDescGZIP(), []int{1, 0}
+	return file_api_brainianc_brawl_proto_rawDescGZIP(), []int{1, 0}
 }
 
 func (x *Game_Spec) GetQuestionDuration() *durationpb.Duration {
@@ -753,17 +753,17 @@ func (x *Game_Spec) GetTargetTime() *durationpb.Duration {
 	return nil
 }
 
-var File_api_brainianc_browl_proto protoreflect.FileDescriptor
+var File_api_brainianc_brawl_proto protoreflect.FileDescriptor
 
-var file_api_brainianc_browl_proto_rawDesc = []byte{
+var file_api_brainianc_brawl_proto_rawDesc = []byte{
 	0x0a, 0x19, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x72, 0x61, 0x69, 0x6e, 0x69, 0x61, 0x6e, 0x63, 0x2d,
-	0x62, 0x72, 0x6f, 0x77, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x61, 0x70, 0x69,
-	0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
-	0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
-	0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e,
-	0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
+	0x62, 0x72, 0x61, 0x77, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x61, 0x70, 0x69,
+	0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e,
+	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
+	0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
+	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
 	0x67, 0x0a, 0x08, 0x47, 0x61, 0x6d, 0x65, 0x4b, 0x69, 0x6e, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6b,
 	0x69, 0x6e, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6b, 0x69, 0x6e, 0x64, 0x12,
@@ -859,7 +859,7 @@ var file_api_brainianc_browl_proto_rawDesc = []byte{
 	0x61, 0x70, 0x69, 0x2e, 0x47, 0x61, 0x6d, 0x65, 0x50, 0x6c, 0x61, 0x79, 0x22, 0x0d, 0x82, 0xd3,
 	0xe4, 0x93, 0x02, 0x07, 0x22, 0x05, 0x2f, 0x70, 0x6c, 0x61, 0x79, 0x28, 0x01, 0x30, 0x01, 0x42,
 	0x56, 0x0a, 0x07, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x70, 0x69, 0x42, 0x13, 0x42, 0x72, 0x61, 0x69,
-	0x6e, 0x69, 0x61, 0x6e, 0x63, 0x42, 0x72, 0x6f, 0x77, 0x6c, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
+	0x6e, 0x69, 0x61, 0x6e, 0x63, 0x42, 0x72, 0x61, 0x77, 0x6c, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
 	0x01, 0x5a, 0x0a, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0xa2, 0x02, 0x03,
 	0x41, 0x58, 0x58, 0xaa, 0x02, 0x03, 0x41, 0x70, 0x69, 0xca, 0x02, 0x03, 0x41, 0x70, 0x69, 0xe2,
 	0x02, 0x0f, 0x41, 0x70, 0x69, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
@@ -867,20 +867,20 @@ var file_api_brainianc_browl_proto_rawDesc = []byte{
 }
 
 var (
-	file_api_brainianc_browl_proto_rawDescOnce sync.Once
-	file_api_brainianc_browl_proto_rawDescData = file_api_brainianc_browl_proto_rawDesc
+	file_api_brainianc_brawl_proto_rawDescOnce sync.Once
+	file_api_brainianc_brawl_proto_rawDescData = file_api_brainianc_brawl_proto_rawDesc
 )
 
-func file_api_brainianc_browl_proto_rawDescGZIP() []byte {
-	file_api_brainianc_browl_proto_rawDescOnce.Do(func() {
-		file_api_brainianc_browl_proto_rawDescData = protoimpl.X.CompressGZIP(file_api_brainianc_browl_proto_rawDescData)
+func file_api_brainianc_brawl_proto_rawDescGZIP() []byte {
+	file_api_brainianc_brawl_proto_rawDescOnce.Do(func() {
+		file_api_brainianc_brawl_proto_rawDescData = protoimpl.X.CompressGZIP(file_api_brainianc_brawl_proto_rawDescData)
 	})
-	return file_api_brainianc_browl_proto_rawDescData
+	return file_api_brainianc_brawl_proto_rawDescData
 }
 
-var file_api_brainianc_browl_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_api_brainianc_browl_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_api_brainianc_browl_proto_goTypes = []any{
+var file_api_brainianc_brawl_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_api_brainianc_brawl_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_api_brainianc_brawl_proto_goTypes = []any{
 	(PlayerStatus)(0),             // 0: api.PlayerStatus
 	(GamePlayStatus)(0),           // 1: api.GamePlayStatus
 	(GamePlayAction)(0),           // 2: api.GamePlayAction
@@ -894,7 +894,7 @@ var file_api_brainianc_browl_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
 	(*durationpb.Duration)(nil),   // 11: google.protobuf.Duration
 }
-var file_api_brainianc_browl_proto_depIdxs = []int32{
+var file_api_brainianc_brawl_proto_depIdxs = []int32{
 	10, // 0: api.Game.created_at:type_name -> google.protobuf.Timestamp
 	10, // 1: api.Game.updated_at:type_name -> google.protobuf.Timestamp
 	9,  // 2: api.Game.spec:type_name -> api.Game.Spec
@@ -917,12 +917,12 @@ var file_api_brainianc_browl_proto_depIdxs = []int32{
 	0,  // [0:13] is the sub-list for field type_name
 }
 
-func init() { file_api_brainianc_browl_proto_init() }
-func file_api_brainianc_browl_proto_init() {
-	if File_api_brainianc_browl_proto != nil {
+func init() { file_api_brainianc_brawl_proto_init() }
+func file_api_brainianc_brawl_proto_init() {
+	if File_api_brainianc_brawl_proto != nil {
 		return
 	}
-	file_api_brainianc_browl_proto_msgTypes[5].OneofWrappers = []any{
+	file_api_brainianc_brawl_proto_msgTypes[5].OneofWrappers = []any{
 		(*GamePlay_Action)(nil),
 		(*GamePlay_Summary)(nil),
 		(*GamePlay_Command)(nil),
@@ -931,19 +931,19 @@ func file_api_brainianc_browl_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_api_brainianc_browl_proto_rawDesc,
+			RawDescriptor: file_api_brainianc_brawl_proto_rawDesc,
 			NumEnums:      3,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_api_brainianc_browl_proto_goTypes,
-		DependencyIndexes: file_api_brainianc_browl_proto_depIdxs,
-		EnumInfos:         file_api_brainianc_browl_proto_enumTypes,
-		MessageInfos:      file_api_brainianc_browl_proto_msgTypes,
+		GoTypes:           file_api_brainianc_brawl_proto_goTypes,
+		DependencyIndexes: file_api_brainianc_brawl_proto_depIdxs,
+		EnumInfos:         file_api_brainianc_brawl_proto_enumTypes,
+		MessageInfos:      file_api_brainianc_brawl_proto_msgTypes,
 	}.Build()
-	File_api_brainianc_browl_proto = out.File
-	file_api_brainianc_browl_proto_rawDesc = nil
-	file_api_brainianc_browl_proto_goTypes = nil
-	file_api_brainianc_browl_proto_depIdxs = nil
+	File_api_brainianc_brawl_proto = out.File
+	file_api_brainianc_brawl_proto_rawDesc = nil
+	file_api_brainianc_brawl_proto_goTypes = nil
+	file_api_brainianc_brawl_proto_depIdxs = nil
 }
