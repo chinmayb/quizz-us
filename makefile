@@ -1,8 +1,7 @@
-
 server:
 	@go run main.go serve
 
-run-client:
+client:
 	@go run main.go client
 
 buf:
@@ -12,6 +11,10 @@ fmt:
 	go fmt ./...
 	buf format -w
 
+# this is to avoid make thinking vendor dir already exists
+.PHONY: vendor
 vendor:
 	go mod tidy && go mod vendor
 
+test:
+	go test -v ./...

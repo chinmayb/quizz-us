@@ -4,17 +4,22 @@ Copyright © 2024 Chinmay
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	log "log/slog"
 	"net"
+	"net/http"
 	"os"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
 	"github.com/chinmayb/brainiac-brawl/pkg/data"
 	"github.com/chinmayb/brainiac-brawl/pkg/play"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // serveCmd represents the serve command
@@ -32,8 +37,8 @@ to quickly create a Cobra application.`,
 			log.Error("error parsing data", err)
 			os.Exit(1)
 		}
-		log.Info("server is running...")
-		spawnServer(cmd)
+		setConfig(cmd)
+		spawnServer()
 	},
 }
 
@@ -51,18 +56,56 @@ func init() {
 	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func spawnServer(cmd *cobra.Command) {
-	cmd.HasPersistentFlags()
-	pflag.Parse()
-	port := pflag.Int("port", 8080, "port")
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+func spawnServer() {
+	logOpts := &slog.HandlerOptions{
+		AddSource: true,
+		Level:     logParser(*logLevel)}
+	logger := log.New(log.NewTextHandler(os.Stdout, logOpts))
+	grpcListener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *grpcPort))
 	if err != nil {
-		log.Error("err listening", err)
+		log.Error("err while listening", "reason", err)
 		os.Exit(1)
 	}
-	logger := log.New(log.NewTextHandler(os.Stdout, nil))
+
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterGamesServer(grpcServer, play.NewPlayServer(logger))
-	grpcServer.Serve(lis)
+
+	// Create game server implementation
+	gameServer := play.NewPlayServer(logger)
+	pb.RegisterGamesServer(grpcServer, gameServer)
+
+	gwmux := runtime.NewServeMux()
+	ctx := context.Background()
+
+	// Update registration
+	if err := pb.RegisterGamesHandlerFromEndpoint(ctx, gwmux, fmt.Sprintf("localhost:%d", *grpcPort),
+		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}); err != nil {
+		logger.Error("failed to register gateway", "error", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		logger.Info("running GRPC Server at", "port", *grpcPort)
+		if err := grpcServer.Serve(grpcListener); err != nil {
+			logger.Error("failed to serve grpc", "error", err)
+			os.Exit(1)
+		}
+	}()
+
+	grpcConn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", *grpcPort),
+		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}...)
+	if err != nil {
+		logger.Error("failed to serve http", "error", err)
+		os.Exit(1)
+	}
+	defer grpcConn.Close()
+	client := pb.NewGamesClient(grpcConn)
+	httpMux := WSHandler(ctx, *logger, client)
+
+	httpMux.Handle("/play", gwmux)
+	logger.Info("Serving gRPC-Gateway & WS on http://0.0.0.0:8080")
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), httpMux); err != nil {
+		logger.Error("failed to serve http", "error", err)
+		os.Exit(1)
+	}
 }

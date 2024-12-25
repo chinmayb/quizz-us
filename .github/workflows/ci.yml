@@ -20,7 +20,8 @@ jobs:
         go-version: '1.22.4'
 
     - name: Vendor
-      run: go mod vendor
+      run: make vendor
 
     - name: Test
-      run: go test -v ./...
+      run: make test
+

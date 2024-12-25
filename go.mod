@@ -3,6 +3,7 @@ module github.com/chinmayb/brainiac-brawl
 go 1.22.4
 
 require (
+	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
