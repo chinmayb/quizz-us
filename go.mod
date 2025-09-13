@@ -1,4 +1,4 @@
-module github.com/chinmayb/brainiac-brawl
+module github.com/chinmayb/quizz-us
 
 go 1.22.4
 

@@ -1,4 +1,4 @@
-# brainiac-brawl
+# quizz-us
 
 Platform to host a multiplayer quiz
 
