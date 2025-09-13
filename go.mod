@@ -3,6 +3,7 @@ module github.com/chinmayb/quizz-us
 go 1.22.4
 
 require (
+	github.com/chinmayb/brainiac-brawl v0.0.0-20241225124024-b9549bb3be1c
 	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1
 	github.com/spf13/cobra v1.8.1
@@ -10,11 +11,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20241219192143-6b3ec007d9bb
 	google.golang.org/grpc v1.69.2
 	google.golang.org/protobuf v1.36.0
-)
-
-require (
-	github.com/kr/text v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
 )
 
 require (
