@@ -14,9 +14,9 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
-	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
-	"github.com/chinmayb/brainiac-brawl/pkg/data"
-	"github.com/chinmayb/brainiac-brawl/pkg/play"
+	pb "github.com/chinmayb/quizz-us/gen/go/api"
+	"github.com/chinmayb/quizz-us/pkg/data"
+	"github.com/chinmayb/quizz-us/pkg/play"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -34,7 +34,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := data.ParseQuizData("./quiz-data.yaml"); err != nil {
-			log.Error("error parsing data", err)
+			log.Error("error parsing data", "reason", err.Error())
 			os.Exit(1)
 		}
 		setConfig(cmd)

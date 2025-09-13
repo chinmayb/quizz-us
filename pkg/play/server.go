@@ -7,9 +7,9 @@ import (
 	log "log/slog"
 	"time"
 
-	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
-	"github.com/chinmayb/brainiac-brawl/pkg/data"
-	"github.com/chinmayb/brainiac-brawl/pkg/gameengine/quiz"
+	pb "github.com/chinmayb/quizz-us/gen/go/api"
+	"github.com/chinmayb/quizz-us/pkg/data"
+	"github.com/chinmayb/quizz-us/pkg/gameengine/quiz"
 )
 
 func NewPlayServer(log *log.Logger) pb.GamesServer {

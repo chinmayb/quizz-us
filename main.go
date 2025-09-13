@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/chinmayb/brainiac-brawl/cmd"
+	"github.com/chinmayb/quizz-us/cmd"
 )
 
 func main() {

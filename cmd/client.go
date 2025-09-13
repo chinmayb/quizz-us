@@ -6,7 +6,7 @@ package cmd
 import (
 	"context"
 
-	"github.com/chinmayb/brainiac-brawl/client"
+	"github.com/chinmayb/quizz-us/client"
 	"github.com/spf13/cobra"
 )
 

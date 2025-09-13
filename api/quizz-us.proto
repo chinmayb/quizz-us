@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/chinmayb/brainiac-brawl/gen/go/api;api";
+option go_package = "github.com/chinmayb/quizz-us/gen/go/api;api";
 
 // Game is an object which represents the type of the games we do support at
 // the global level

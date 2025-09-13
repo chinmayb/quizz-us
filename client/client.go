@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"os"
 
-	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
+	pb "github.com/chinmayb/quizz-us/gen/go/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
