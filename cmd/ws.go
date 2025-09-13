@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
+	pb "github.com/chinmayb/quizz-us/gen/go/api"
 )
 
 var upgrader = websocket.Upgrader{
@@ -15,7 +15,7 @@ var upgrader = websocket.Upgrader{
 		origin := r.Header.Get("Origin")
 		switch origin {
 		case "http://localhost:8090", // dev frontend
-			"https://brainiac-brawl.com": // production frontend
+			"https://quizz.us": // production frontend
 			return true
 		default:
 			return false
