@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chinmayb/brainiac-brawl/pkg/data"
+	"github.com/chinmayb/quizz-us/pkg/data"
 )
 
 // QuizEngine is the actual implementation of producing questions

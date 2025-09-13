@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/chinmayb/brainiac-brawl/gen/go/api"
-	"github.com/chinmayb/brainiac-brawl/pkg/data"
+	pb "github.com/chinmayb/quizz-us/gen/go/api"
+	"github.com/chinmayb/quizz-us/pkg/data"
 )
 
 // Declare the global variable
