@@ -1,0 +1,1326 @@
+/* Frame 1 */
+
+position: relative;
+width: 757px;
+height: 125px;
+
+
+
+/* Frame 2 */
+
+position: absolute;
+width: 794px;
+height: 443px;
+left: -27px;
+top: -24px;
+
+
+
+/* Accordion Item
+
+The items have a fixed width of 640 in the component set, but when placed in designs their auto layout and width settings should be defined by their parent
+*/
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 16px;
+gap: 8px;
+
+position: absolute;
+width: 778px;
+height: 421px;
+left: 8px;
+top: 6px;
+
+background: #FFFFFF;
+border: 1px solid #D9D9D9;
+border-radius: 8px;
+
+
+/* Accordion Title */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 8px;
+
+width: 746px;
+height: 22px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Title */
+
+width: 718px;
+height: 22px;
+
+/* Body Strong */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Chevron up
+
+Keywords: collapse
+*/
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 2px solid #1E1E1E;
+
+
+/* Accordion Content */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 746px;
+height: 22px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Body */
+
+width: 746px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+display: flex;
+align-items: center;
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Image */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+position: absolute;
+width: 355px;
+height: 238px;
+left: 108px;
+top: 88px;
+
+/* Image Placeholder */
+background: url(image.png), #E3E3E3;
+
+
+/* Menu
+
+This is an example of a composed menu.
+
+If you require a different composition, you can build one using the Primitives.
+
+Keywords: popover
+*/
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 8px;
+
+position: absolute;
+width: 142px;
+height: 338px;
+left: 600px;
+top: 74px;
+
+background: #FFFFFF;
+border: 1px solid #D9D9D9;
+/* Drop Shadow/300 */
+box-shadow: 0px 4px 4px -1px rgba(12, 12, 13, 0.1), 0px 4px 4px -1px rgba(12, 12, 13, 0.05);
+border-radius: 8px;
+
+
+/* Menu Header */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 8px 16px 4px;
+
+width: 126px;
+height: 54px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Heading */
+
+width: 94px;
+height: 20px;
+
+/* Body Small */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 140%;
+/* identical to box height, or 20px */
+
+color: #757575;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Heading */
+
+width: 94px;
+height: 22px;
+
+/* Body Strong */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Separator */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 8px 16px;
+
+width: 126px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Rule */
+
+width: 94px;
+height: 1px;
+
+background: #D9D9D9;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Section */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 126px;
+height: 290px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Item
+
+Keywords: popover
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 16px;
+gap: 12px;
+
+width: 285px;
+height: 70px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Star
+
+Keywords: bookmark, favorite, like
+*/
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 12.42%;
+
+border: 2px solid #1E1E1E;
+
+
+/* Body */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 4px;
+
+width: 221px;
+height: 46px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Row */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 0px;
+gap: 4px;
+
+width: 221px;
+height: 22px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Label */
+
+margin: 0 auto;
+width: 221px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Menu Shortcut
+
+Example shortcut characters:
+
+⌘
+⇧
+⌥
+⌃
+*/
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: center;
+padding: 0px;
+
+margin: 0 auto;
+display: none;
+width: 28px;
+height: 16px;
+
+background: #FFFFFF;
+opacity: 0.2;
+border: 1px solid #000000;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Description */
+
+width: 221px;
+height: 20px;
+
+/* Body Small */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 140%;
+/* identical to box height, or 20px */
+
+color: #757575;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Item
+
+Keywords: popover
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 16px;
+gap: 12px;
+
+width: 126px;
+height: 110px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Star
+
+Keywords: bookmark, favorite, like
+*/
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 12.42%;
+
+border: 2px solid #1E1E1E;
+
+
+/* Body */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 4px;
+
+width: 62px;
+height: 86px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Row */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 0px;
+gap: 4px;
+
+width: 62px;
+height: 22px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Label */
+
+margin: 0 auto;
+width: 42px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Menu Shortcut
+
+Example shortcut characters:
+
+⌘
+⇧
+⌥
+⌃
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: center;
+padding: 0px;
+
+margin: 0 auto;
+width: 20px;
+height: 16px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* ⇧A */
+
+width: 20px;
+height: 16px;
+
+/* Single Line/Body Base
+
+Used for any text element where you need 100% line height. For example, an input field, a label.
+*/
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 100%;
+/* identical to box height, or 16px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Description */
+
+width: 62px;
+height: 60px;
+
+/* Body Small */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+
+color: #757575;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Item
+
+Keywords: popover
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 12px 16px;
+gap: 12px;
+
+width: 126px;
+height: 110px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Star
+
+Keywords: bookmark, favorite, like
+*/
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 12.42%;
+
+border: 2px solid #1E1E1E;
+
+
+/* Body */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 4px;
+
+width: 62px;
+height: 86px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Row */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 0px;
+gap: 4px;
+
+width: 62px;
+height: 22px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Label */
+
+margin: 0 auto;
+width: 41px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Menu Shortcut
+
+Example shortcut characters:
+
+⌘
+⇧
+⌥
+⌃
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: center;
+padding: 0px;
+
+margin: 0 auto;
+width: 21px;
+height: 16px;
+
+opacity: 0.3;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* ⇧A */
+
+width: 21px;
+height: 16px;
+
+/* Single Line/Body Base
+
+Used for any text element where you need 100% line height. For example, an input field, a label.
+*/
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 100%;
+/* identical to box height, or 16px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Description */
+
+width: 62px;
+height: 60px;
+
+/* Body Small */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 140%;
+/* or 20px */
+
+color: #757575;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Separator */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 8px 16px;
+
+width: 126px;
+height: 17px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Rule */
+
+width: 94px;
+height: 1px;
+
+background: #D9D9D9;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Menu Section */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+display: none;
+width: 285px;
+height: 140px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 4;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Avatar Group */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 4px;
+
+position: absolute;
+width: 156px;
+height: 40px;
+left: 594.96px;
+top: 28.84px;
+
+transform: rotate(0.12deg);
+
+
+/* Avatar
+
+Initials should be single e.g. A, B, or C, and not multiple e.g. AA, BB, or CC.
+
+This is because the widths of the avatars would force the text to overflow outside.
+*/
+
+width: 40px;
+height: 40px;
+
+border-radius: 9999px;
+transform: rotate(0.12deg);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Shape */
+
+position: absolute;
+width: 40px;
+height: 40px;
+left: calc(50% - 40px/2);
+top: calc(50% - 40px/2);
+
+background: url(image.png);
+transform: rotate(0.12deg);
+
+
+/* Avatar
+
+Initials should be single e.g. A, B, or C, and not multiple e.g. AA, BB, or CC.
+
+This is because the widths of the avatars would force the text to overflow outside.
+*/
+
+width: 40px;
+height: 40px;
+
+border-radius: 9999px;
+transform: rotate(0.12deg);
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Shape */
+
+position: absolute;
+width: 40px;
+height: 40px;
+left: calc(50% - 40px/2);
+top: calc(50% - 40px/2);
+
+background: url(image.png);
+transform: rotate(0.12deg);
+
+
+/* Avatar
+
+Initials should be single e.g. A, B, or C, and not multiple e.g. AA, BB, or CC.
+
+This is because the widths of the avatars would force the text to overflow outside.
+*/
+
+width: 40px;
+height: 40px;
+
+border-radius: 9999px;
+transform: rotate(0.12deg);
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Shape */
+
+position: absolute;
+width: 40px;
+height: 40px;
+left: calc(50% - 40px/2);
+top: calc(50% - 40px/2);
+
+background: url(image (2).png);
+transform: rotate(0.12deg);
+
+
+/* Overflow */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 5px 4px;
+gap: 10px;
+
+width: 24px;
+min-width: 24px;
+height: 30px;
+
+background: #F5F5F5;
+border-radius: 8px;
+transform: rotate(0.12deg);
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Initials */
+
+width: 16px;
+height: 20px;
+
+/* Body Small */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 140%;
+/* identical to box height, or 20px */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #757575;
+
+transform: rotate(0.12deg);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Input Field */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 8px;
+
+position: absolute;
+width: 355px;
+height: 71px;
+left: 108px;
+top: 341px;
+
+
+
+/* Label */
+
+width: 355px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Description */
+
+display: none;
+width: 240px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #757575;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Input */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 12px 16px;
+
+width: 355px;
+min-width: 240px;
+height: 40px;
+
+background: #FFFFFF;
+border: 1px solid #D9D9D9;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Value */
+
+width: 323px;
+height: 16px;
+
+/* Single Line/Body Base
+
+Used for any text element where you need 100% line height. For example, an input field, a label.
+*/
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 100%;
+/* identical to box height, or 16px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Error */
+
+display: none;
+width: 37px;
+height: 22px;
+
+/* Body Base */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 140%;
+/* or 22px */
+
+color: #1E1E1E;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Button */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 12px;
+gap: 8px;
+
+position: absolute;
+width: 77px;
+height: 40px;
+left: 482px;
+top: 371px;
+
+background: #2C2C2C;
+border: 1px solid #2C2C2C;
+border-radius: 8px;
+
+
+/* Star
+
+Keywords: bookmark, favorite, like
+*/
+
+display: none;
+width: 16px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+width: 53px;
+height: 16px;
+
+/* Single Line/Body Base
+
+Used for any text element where you need 100% line height. For example, an input field, a label.
+*/
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 100%;
+/* identical to box height, or 16px */
+
+color: #F5F5F5;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* X
+
+Keywords: cancel, close, delete, remove, times, clear
+*/
+
+display: none;
+width: 16px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Clock
+
+Keywords: time, watch, alarm
+*/
+
+position: relative;
+width: 42px;
+height: 40px;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.33%;
+
+border: 4px solid #1E1E1E;

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizz-Us - Component Based</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Header with User Avatars -->
+            <div class="header">
+                <user-avatars :users="users" />
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <!-- Quiz Question Section -->
+                <div class="quiz-section">
+                    <quiz-question 
+                        :question="currentQuestion"
+                        v-model:user-answer="userAnswer"
+                        :is-submitted="isSubmitted"
+                        :show-result="showResult"
+                        :is-correct="isCorrect"
+                        @submit-answer="handleSubmitAnswer"
+                        @next-question="loadNewQuestion"
+                    />
+                </div>
+
+                <!-- Sidebar Menu -->
+                <div class="sidebar">
+                    <sidebar-menu 
+                        :menu-items="menuItems"
+                        :question-rating="questionRating"
+                        @select-menu-item="handleSelectMenuItem"
+                        @rate-question="handleRateQuestion"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        // Define components inline
+        const UserAvatars = {
+            props: {
+                users: {
+                    type: Array,
+                    required: true
+                }
+            },
+            
+            template: `
+                <div class="avatar-group">
+                    <div class="avatar" v-for="user in displayUsers" :key="user.id">
+                        <img :src="user.avatar" :alt="user.name" v-if="user.avatar">
+                        <span v-else>{{ user.initials }}</span>
+                    </div>
+                    <div class="overflow-avatar" v-if="users.length > 3">
+                        +{{ users.length - 3 }}
+                    </div>
+                </div>
+            `,
+            
+            computed: {
+                displayUsers() {
+                    return this.users.slice(0, 3);
+                }
+            }
+        };
+
+        const QuizQuestion = {
+            props: {
+                question: {
+                    type: Object,
+                    required: true
+                },
+                userAnswer: {
+                    type: String,
+                    default: ''
+                },
+                isSubmitted: {
+                    type: Boolean,
+                    default: false
+                },
+                showResult: {
+                    type: Boolean,
+                    default: false
+                },
+                isCorrect: {
+                    type: Boolean,
+                    default: false
+                }
+            },
+            
+            emits: ['update:userAnswer', 'submit-answer', 'next-question'],
+            
+            template: `
+                <div class="question-container">
+                    <h2 class="question-title">{{ question.title }}</h2>
+                    <div class="question-content">
+                        <div class="question-image">
+                            <img :src="question.image" :alt="question.title" v-if="question.image">
+                            <div class="image-placeholder" v-else>
+                                <span>📷 Question Image</span>
+                            </div>
+                        </div>
+                        <div class="question-text">
+                            <p>{{ question.text }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Answer Input -->
+                    <div class="answer-section">
+                        <label for="answer-input" class="input-label">Your Answer</label>
+                        <div class="input-container">
+                            <input 
+                                type="text" 
+                                id="answer-input"
+                                :value="userAnswer"
+                                @input="$emit('update:userAnswer', $event.target.value)"
+                                @keyup.enter="$emit('submit-answer')"
+                                placeholder="Type your answer here..."
+                                class="answer-input"
+                                :disabled="isSubmitted"
+                            >
+                            <button 
+                                @click="$emit('submit-answer')" 
+                                class="submit-button" 
+                                :disabled="!canSubmit"
+                            >
+                                {{ isSubmitted ? 'Submitted' : 'Submit' }}
+                            </button>
+                        </div>
+                        
+                        <!-- Result Display -->
+                        <div v-if="showResult" :class="['result-message', resultClass]">
+                            {{ resultMessage }}
+                        </div>
+                        
+                        <!-- Next Question Button -->
+                        <div v-if="showResult" class="next-question-section">
+                            <button @click="$emit('next-question')" class="next-button">
+                                Next Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            computed: {
+                canSubmit() {
+                    return this.userAnswer.trim().length > 0 && !this.isSubmitted;
+                },
+                
+                resultMessage() {
+                    if (!this.showResult) return '';
+                    return this.isCorrect ? 'Correct! 🎉' : `Incorrect. The answer is: ${this.question.correctAnswer}`;
+                },
+                
+                resultClass() {
+                    if (!this.showResult) return '';
+                    return this.isCorrect ? 'result-correct' : 'result-incorrect';
+                }
+            }
+        };
+
+        const SidebarMenu = {
+            props: {
+                menuItems: {
+                    type: Array,
+                    required: true
+                },
+                questionRating: {
+                    type: Number,
+                    default: 0
+                }
+            },
+            
+            emits: ['select-menu-item', 'rate-question'],
+            
+            template: `
+                <div class="menu">
+                    <div class="menu-header">
+                        <h3 class="menu-title">Quiz Options</h3>
+                    </div>
+                    
+                    <div class="menu-separator"></div>
+                    
+                    <div class="menu-section">
+                        <div class="menu-item" 
+                             v-for="item in menuItems" 
+                             :key="item.id"
+                             :class="{ active: item.active }"
+                             @click="$emit('select-menu-item', item)">
+                            <div class="menu-icon">
+                                <span v-if="item.icon">{{ item.icon }}</span>
+                            </div>
+                            <div class="menu-content">
+                                <div class="menu-label">{{ item.label }}</div>
+                                <div class="menu-description" v-if="item.description">{{ item.description }}</div>
+                            </div>
+                            <div class="menu-shortcut" v-if="item.shortcut">{{ item.shortcut }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-separator"></div>
+                    
+                    <!-- Star Rating -->
+                    <div class="rating-section">
+                        <div class="rating-label">Rate this question:</div>
+                        <div class="star-rating">
+                            <span v-for="star in 5" 
+                                  :key="star" 
+                                  class="star"
+                                  :class="{ filled: star <= questionRating }"
+                                  @click="$emit('rate-question', star)">
+                                ★
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Create the main app
+        createApp({
+            components: {
+                UserAvatars,
+                QuizQuestion,
+                SidebarMenu
+            },
+            
+            data() {
+                return {
+                    // Sample users for avatar display
+                    users: [
+                        { id: 1, name: 'John Doe', initials: 'JD', avatar: null },
+                        { id: 2, name: 'Jane Smith', initials: 'JS', avatar: null },
+                        { id: 3, name: 'Bob Wilson', initials: 'BW', avatar: null },
+                        { id: 4, name: 'Alice Brown', initials: 'AB', avatar: null }
+                    ],
+                    
+                    // Current question data
+                    currentQuestion: {
+                        id: 1,
+                        title: 'What is the capital of France?',
+                        text: 'This is a sample quiz question. Can you identify the correct answer?',
+                        image: null,
+                        correctAnswer: 'Paris'
+                    },
+                    
+                    // User's current answer
+                    userAnswer: '',
+                    
+                    // Menu items for sidebar
+                    menuItems: [
+                        { 
+                            id: 1, 
+                            label: 'Favorites', 
+                            description: 'Your favorite questions',
+                            icon: '★',
+                            shortcut: null,
+                            active: false
+                        },
+                        { 
+                            id: 2, 
+                            label: 'All Questions', 
+                            description: 'Browse all available questions',
+                            icon: '📚',
+                            shortcut: '⇧A',
+                            active: true
+                        },
+                        { 
+                            id: 3, 
+                            label: 'Recent', 
+                            description: 'Recently viewed questions',
+                            icon: '🕒',
+                            shortcut: null,
+                            active: false
+                        }
+                    ],
+                    
+                    // Question rating
+                    questionRating: 0,
+                    
+                    // Quiz state
+                    isSubmitted: false,
+                    showResult: false,
+                    isCorrect: false
+                }
+            },
+            
+            methods: {
+                // Handle answer submission
+                handleSubmitAnswer() {
+                    if (!this.userAnswer.trim()) return;
+                    
+                    this.isSubmitted = true;
+                    this.isCorrect = this.userAnswer.toLowerCase().trim() === this.currentQuestion.correctAnswer.toLowerCase();
+                    this.showResult = true;
+                    
+                    // Show result for 3 seconds, then reset
+                    setTimeout(() => {
+                        this.resetQuestion();
+                    }, 3000);
+                },
+                
+                // Reset question for next attempt
+                resetQuestion() {
+                    this.userAnswer = '';
+                    this.isSubmitted = false;
+                    this.showResult = false;
+                    this.isCorrect = false;
+                    this.questionRating = 0;
+                },
+                
+                // Handle menu item selection
+                handleSelectMenuItem(item) {
+                    // Remove active state from all items
+                    this.menuItems.forEach(menuItem => {
+                        menuItem.active = false;
+                    });
+                    
+                    // Set active state for selected item
+                    item.active = true;
+                    
+                    console.log('Selected menu item:', item.label);
+                },
+                
+                // Handle question rating
+                handleRateQuestion(rating) {
+                    this.questionRating = rating;
+                    console.log('Rated question:', rating, 'stars');
+                },
+                
+                // Load a new question
+                loadNewQuestion() {
+                    const sampleQuestions = [
+                        {
+                            id: 2,
+                            title: 'What is 2 + 2?',
+                            text: 'A simple math question to test your knowledge.',
+                            image: null,
+                            correctAnswer: '4'
+                        },
+                        {
+                            id: 3,
+                            title: 'What is the largest planet in our solar system?',
+                            text: 'Think about the planets and their relative sizes.',
+                            image: null,
+                            correctAnswer: 'Jupiter'
+                        },
+                        {
+                            id: 4,
+                            title: 'What is the smallest country in the world?',
+                            text: 'This country is located within Rome.',
+                            image: null,
+                            correctAnswer: 'Vatican City'
+                        }
+                    ];
+                    
+                    const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+                    this.currentQuestion = randomQuestion;
+                    this.resetQuestion();
+                }
+            },
+            
+            mounted() {
+                console.log('Quizz-Us component-based app initialized successfully!');
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

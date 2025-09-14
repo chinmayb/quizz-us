@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizz-Us - Modular Components</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Header with User Avatars -->
+            <div class="header">
+                <user-avatars :users="users" />
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <!-- Quiz Question Section -->
+                <div class="quiz-section">
+                    <quiz-question 
+                        :question="currentQuestion"
+                        v-model:user-answer="userAnswer"
+                        :is-submitted="isSubmitted"
+                        :show-result="showResult"
+                        :is-correct="isCorrect"
+                        @submit-answer="handleSubmitAnswer"
+                        @next-question="loadNewQuestion"
+                    />
+                </div>
+
+                <!-- Sidebar Menu -->
+                <div class="sidebar">
+                    <sidebar-menu 
+                        :menu-items="menuItems"
+                        :question-rating="questionRating"
+                        @select-menu-item="handleSelectMenuItem"
+                        @rate-question="handleRateQuestion"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Components -->
+    <script src="components/UserAvatars.js"></script>
+    <script src="components/QuizQuestion.js"></script>
+    <script src="components/SidebarMenu.js"></script>
+    
+    <!-- Load Main App -->
+    <script src="app-components.js"></script>
+</body>
+</html>
