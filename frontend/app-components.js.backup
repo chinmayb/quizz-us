@@ -1,0 +1,442 @@
+const { createApp } = Vue;
+
+// Debug logging for component availability
+console.log('🔍 Vue Components Debug:');
+console.log('UserAvatars available:', !!window.UserAvatars);
+console.log('QuizQuestion available:', !!window.QuizQuestion);
+console.log('SidebarMenu available:', !!window.SidebarMenu);
+console.log('HomePage available:', !!window.HomePage);
+console.log('JoinGameForm available:', !!window.JoinGameForm);
+console.log('ScoreDisplay available:', !!window.ScoreDisplay);
+
+createApp({
+  components: {
+    UserAvatars: window.UserAvatars,
+    QuizQuestion: window.QuizQuestion,
+    SidebarMenu: window.SidebarMenu,
+    HomePage: window.HomePage,
+    JoinGameForm: window.JoinGameForm,
+    ScoreDisplay: window.ScoreDisplay
+  },
+  
+  data() {
+    return {
+      // WebSocket connection
+      websocket: null,
+      isConnected: false,
+      reconnectAttempts: 0,
+      maxReconnectAttempts: 5,
+      reconnectInterval: 3000,
+      
+      // Game session data
+      playerId: null,
+      gameCode: null,
+      
+      // Sample users for avatar display
+      users: [
+        { id: 1, name: 'John Doe', initials: 'JD', avatar: null },
+        { id: 2, name: 'Jane Smith', initials: 'JS', avatar: null },
+        { id: 3, name: 'Bob Wilson', initials: 'BW', avatar: null },
+        { id: 4, name: 'Alice Brown', initials: 'AB', avatar: null }
+      ],
+      
+      // Current question data
+      currentQuestion: {
+        id: 1,
+        title: 'What is the capital of France?',
+        text: 'This is a sample quiz question. Can you identify the correct answer?',
+        image: null,
+        correctAnswer: 'Paris'
+      },
+      
+      // User's current answer
+      userAnswer: '',
+      
+      // Menu items for sidebar
+      menuItems: [
+        { 
+          id: 1, 
+          label: 'Favorites', 
+          description: 'Your favorite questions',
+          icon: '★',
+          shortcut: null,
+          active: false
+        },
+        { 
+          id: 2, 
+          label: 'All Questions', 
+          description: 'Browse all available questions',
+          icon: '📚',
+          shortcut: '⇧A',
+          active: true
+        },
+        { 
+          id: 3, 
+          label: 'Recent', 
+          description: 'Recently viewed questions',
+          icon: '🕒',
+          shortcut: null,
+          active: false
+        }
+      ],
+      
+      // Question rating
+      questionRating: 0,
+      
+      // Quiz state
+      isSubmitted: false,
+      showResult: false,
+      isCorrect: false,
+      
+      // Connection status message for UI
+      connectionStatus: 'Disconnected'
+    }
+  },
+  
+  methods: {
+    // WebSocket connection methods
+    connectWebSocket() {
+      console.log('🔌 Initiating WebSocket connection...');
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      // For development, connect to the Go server on localhost:8080
+      let wsUrl;
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        wsUrl = `${wsProtocol}//127.0.0.1:8080/playws`;
+      } else {
+        wsUrl = `${wsProtocol}//${window.location.host}/playws`;
+      }
+      
+      console.log('🎯 WebSocket URL:', wsUrl);
+      this.connectionStatus = 'Connecting...';
+      
+      try {
+        this.websocket = new WebSocket(wsUrl);
+        
+        this.websocket.onopen = this.onWebSocketOpen;
+        this.websocket.onmessage = this.onWebSocketMessage;
+        this.websocket.onclose = this.onWebSocketClose;
+        this.websocket.onerror = this.onWebSocketError;
+        
+        console.log('✅ WebSocket object created, attempting to connect...');
+      } catch (error) {
+        console.error('❌ Failed to create WebSocket connection:', error);
+        this.connectionStatus = 'Connection Failed';
+        this.handleReconnect();
+      }
+    },
+    
+    onWebSocketOpen(event) {
+      console.log('🎉 WebSocket connected successfully!', event);
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
+      this.connectionStatus = 'Connected';
+      
+      // Generate a unique player ID if not already set
+      if (!this.playerId) {
+        this.playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        console.log('🆔 Generated new player ID:', this.playerId);
+      } else {
+        console.log('🆔 Using existing player ID:', this.playerId);
+      }
+      
+      // Send JOIN action to start the game session
+      console.log('📤 Sending JOIN action to start game session...');
+      this.sendGamePlayAction('JOIN');
+    },
+    
+    onWebSocketMessage(event) {
+      try {
+        console.log('📨 Received WebSocket message:', event.data);
+        
+        // Parse the message (assuming it's JSON representation of GamePlay protobuf)
+        let gamePlayData;
+        try {
+          gamePlayData = JSON.parse(event.data);
+          console.log('📦 Successfully parsed JSON message:', gamePlayData);
+        } catch (parseError) {
+          // If it's not JSON, treat as raw protobuf string
+          console.log('⚠️ Received non-JSON message, treating as protobuf string:', event.data);
+          this.handleProtobufMessage(event.data);
+          return;
+        }
+        
+        console.log('🔄 Processing GamePlay message...');
+        this.handleGamePlayMessage(gamePlayData);
+      } catch (error) {
+        console.error('❌ Error processing WebSocket message:', error);
+        console.error('📄 Raw message data:', event.data);
+      }
+    },
+    
+    onWebSocketClose(event) {
+      console.log('🔌 WebSocket connection closed:', event.code, event.reason);
+      console.log('📊 Connection details:', {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean,
+        timestamp: new Date().toISOString()
+      });
+      this.isConnected = false;
+      this.connectionStatus = 'Disconnected';
+      
+      if (event.code !== 1000) { // Not a normal closure
+        console.log('⚠️ Abnormal connection closure detected, attempting reconnection...');
+        this.connectionStatus = 'Reconnecting...';
+        this.handleReconnect();
+      } else {
+        console.log('✅ Normal connection closure');
+      }
+    },
+
+    onWebSocketError(error) {
+      console.error('❌ WebSocket error occurred:', error);
+      console.error('🔍 Error details:', {
+        type: error.type,
+        target: error.target,
+        timestamp: new Date().toISOString()
+      });
+      this.isConnected = false;
+      this.connectionStatus = 'Connection Error';
+    },    handleReconnect() {
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        this.connectionStatus = `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`;
+        console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+        
+        setTimeout(() => {
+          this.connectWebSocket();
+        }, this.reconnectInterval);
+      } else {
+        console.error('Max reconnection attempts reached. Please refresh the page.');
+        this.connectionStatus = 'Connection Failed - Please Refresh';
+      }
+    },
+    
+    // Manual reconnect method for user-triggered reconnection
+    manualReconnect() {
+      this.reconnectAttempts = 0;
+      this.disconnectWebSocket();
+      setTimeout(() => {
+        this.connectWebSocket();
+      }, 1000);
+    },
+    
+    // Send GamePlay messages
+    sendGamePlayAction(action) {
+      if (!this.isConnected || !this.websocket) {
+        console.warn('WebSocket not connected, cannot send action:', action);
+        return;
+      }
+      
+      const gamePlay = {
+        id: this.playerId,
+        code: this.gameCode || '',
+        action: action
+      };
+      
+      this.websocket.send(JSON.stringify(gamePlay));
+      console.log('Sent GamePlay action:', gamePlay);
+    },
+    
+    sendGamePlayCommand(questionId, playerAnswer, question, correctAnswer) {
+      if (!this.isConnected || !this.websocket) {
+        console.warn('WebSocket not connected, cannot send command');
+        return;
+      }
+      
+      const gamePlay = {
+        id: this.playerId,
+        code: this.gameCode || '',
+        command: {
+          id: questionId,
+          player_answer: playerAnswer,
+          question: question,
+          correct_answer: correctAnswer,
+          question_time: new Date().toISOString()
+        }
+      };
+      
+      this.websocket.send(JSON.stringify(gamePlay));
+      console.log('Sent GamePlay command:', gamePlay);
+    },
+    
+    handleGamePlayMessage(gamePlayData) {
+      console.log('Processing GamePlay message:', gamePlayData);
+      
+      // Handle different types of GamePlay messages
+      if (gamePlayData.summary) {
+        this.handleGameSummary(gamePlayData.summary);
+      } else if (gamePlayData.command) {
+        this.handleGameCommand(gamePlayData.command);
+      } else if (gamePlayData.action) {
+        this.handleGameAction(gamePlayData.action);
+      }
+    },
+    
+    handleProtobufMessage(rawMessage) {
+      // Handle raw protobuf string messages from the backend
+      console.log('Handling raw protobuf message:', rawMessage);
+      
+      // For now, just log it. In a real implementation, you might want to
+      // parse the protobuf message or handle it according to your backend format
+      try {
+        // Attempt to extract useful information from the raw message
+        // This is a simplified approach - in production you'd want proper protobuf parsing
+        if (rawMessage.includes('question')) {
+          // Looks like a question message
+          this.handleQuestionFromProtobuf(rawMessage);
+        }
+      } catch (error) {
+        console.error('Error handling protobuf message:', error);
+      }
+    },
+    
+    handleQuestionFromProtobuf(message) {
+      // Simplified parsing of protobuf message
+      // In a real implementation, you'd use proper protobuf parsing
+      console.log('Handling question from protobuf:', message);
+      
+      // For demo purposes, create a new question
+      this.loadNewQuestion();
+    },
+    
+    handleGameSummary(summary) {
+      console.log('Game summary received:', summary);
+      // Handle game over, player list updates, etc.
+    },
+    
+    handleGameCommand(command) {
+      console.log('Game command received:', command);
+      
+      // Update current question with data from server
+      if (command.question) {
+        this.currentQuestion = {
+          id: command.id || this.currentQuestion.id,
+          title: command.question,
+          text: command.question,
+          image: null,
+          correctAnswer: command.correct_answer || ''
+        };
+      }
+    },
+    
+    handleGameAction(action) {
+      console.log('Game action received:', action);
+      // Handle server actions like game start, end, etc.
+    },
+    
+    disconnectWebSocket() {
+      if (this.websocket) {
+        this.websocket.close(1000, 'User disconnected');
+        this.websocket = null;
+        this.isConnected = false;
+      }
+    },
+    // Handle answer submission with WebSocket integration
+    handleSubmitAnswer() {
+      if (!this.userAnswer.trim()) return;
+      
+      // Send answer to server via WebSocket
+      if (this.isConnected) {
+        this.sendGamePlayCommand(
+          this.currentQuestion.id.toString(),
+          this.userAnswer.trim(),
+          this.currentQuestion.title,
+          this.currentQuestion.correctAnswer
+        );
+      }
+      
+      // Local UI feedback (keep for immediate response)
+      this.isSubmitted = true;
+      this.isCorrect = this.userAnswer.toLowerCase().trim() === this.currentQuestion.correctAnswer.toLowerCase();
+      this.showResult = true;
+      
+      // Show result for 3 seconds, then reset
+      setTimeout(() => {
+        this.resetQuestion();
+      }, 3000);
+    },
+    
+    // Reset question for next attempt
+    resetQuestion() {
+      this.userAnswer = '';
+      this.isSubmitted = false;
+      this.showResult = false;
+      this.isCorrect = false;
+      this.questionRating = 0;
+    },
+    
+    // Handle menu item selection
+    handleSelectMenuItem(item) {
+      // Remove active state from all items
+      this.menuItems.forEach(menuItem => {
+        menuItem.active = false;
+      });
+      
+      // Set active state for selected item
+      item.active = true;
+      
+      console.log('Selected menu item:', item.label);
+    },
+    
+    // Handle question rating
+    handleRateQuestion(rating) {
+      this.questionRating = rating;
+      console.log('Rated question:', rating, 'stars');
+    },
+    
+    // Load a new question
+    loadNewQuestion() {
+      const sampleQuestions = [
+        {
+          id: 2,
+          title: 'What is 2 + 2?',
+          text: 'A simple math question to test your knowledge.',
+          image: null,
+          correctAnswer: '4'
+        },
+        {
+          id: 3,
+          title: 'What is the largest planet in our solar system?',
+          text: 'Think about the planets and their relative sizes.',
+          image: null,
+          correctAnswer: 'Jupiter'
+        },
+        {
+          id: 4,
+          title: 'What is the smallest country in the world?',
+          text: 'This country is located within Rome.',
+          image: null,
+          correctAnswer: 'Vatican City'
+        }
+      ];
+      
+      const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+      this.currentQuestion = randomQuestion;
+      this.resetQuestion();
+    }
+  },
+  
+  mounted() {
+    console.log('🚀 Quizz-Us modular component-based app initialized successfully!');
+    console.log('📊 Components loaded:', {
+      UserAvatars: !!window.UserAvatars,
+      QuizQuestion: !!window.QuizQuestion,
+      SidebarMenu: !!window.SidebarMenu,
+      HomePage: !!window.HomePage,
+      JoinGameForm: !!window.JoinGameForm,
+      ScoreDisplay: !!window.ScoreDisplay
+    });
+    
+    console.log('🔧 Registered components:', Object.keys(this.$options.components));
+    console.log('🌐 Starting WebSocket connection...');
+    
+    // Initialize WebSocket connection
+    this.connectWebSocket();
+  },
+  
+  beforeUnmount() {
+    // Clean up WebSocket connection when component is destroyed
+    this.disconnectWebSocket();
+  }
+}).mount('#app');

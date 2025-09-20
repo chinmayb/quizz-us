@@ -7,12 +7,6 @@ A Vue.js frontend for the Quizz-Us application with multiple implementation appr
 ```bash
 # Modular components (recommended for development)
 open index-modular.html
-
-# Inline components (self-contained)
-open index-components.html
-
-# Original single-file version
-open index.html
 ```
 
 ## 📁 Files

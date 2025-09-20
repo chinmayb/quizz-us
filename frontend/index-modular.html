@@ -3,53 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizz-Us - Modular Components</title>
+    <title>QuizUS - Multiplayer Quiz Platform</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="home-styles.css">
 </head>
+
 <body>
     <div id="app">
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Header with User Avatars -->
-            <div class="header">
-                <user-avatars :users="users" />
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="content-area">
-                <!-- Quiz Question Section -->
-                <div class="quiz-section">
-                    <quiz-question 
-                        :question="currentQuestion"
-                        v-model:user-answer="userAnswer"
-                        :is-submitted="isSubmitted"
-                        :show-result="showResult"
-                        :is-correct="isCorrect"
-                        @submit-answer="handleSubmitAnswer"
-                        @next-question="loadNewQuestion"
-                    />
+        <!-- Home Page View -->
+        <div v-if="currentView === 'home'" class="app-container">
+            <home-page
+                :is-connected="isConnected"
+                :connection-status="connectionStatus"
+                @join-game="showJoinForm"
+                @host-game="showHostForm"
+            ></home-page>
+            
+            <!-- Score Display Section -->
+            <score-display
+                :stats="gameStats"
+                :animated="true"
+            ></score-display>
+        </div>
+        
+        <!-- Join Game Form Modal -->
+        <join-game-form
+            v-if="showJoinGameForm"
+            :is-connected="isConnected"
+            :is-joining="isJoining"
+            @join-game="handleJoinGame"
+            @cancel-join="hideJoinForm"
+        ></join-game-form>
+        
+        <!-- Game View (when connected to a game) -->
+        <div v-if="currentView === 'game'" class="game-container">
+            <div class="game-header">
+                <h2>Game: {{ gameCode }}</h2>
+                <div class="player-info">
+                    <span>Player: {{ playerName }}</span>
+                    <button @click="leaveGame" class="btn btn-secondary">Leave Game</button>
                 </div>
-
-                <!-- Sidebar Menu -->
-                <div class="sidebar">
-                    <sidebar-menu 
-                        :menu-items="menuItems"
-                        :question-rating="questionRating"
-                        @select-menu-item="handleSelectMenuItem"
-                        @rate-question="handleRateQuestion"
-                    />
+            </div>
+            
+            <div class="game-content">
+                <div v-if="gameState === 'waiting'" class="waiting-room">
+                    <h3>Waiting for game to start...</h3>
+                    <div class="loading-spinner"></div>
+                    <p>Game Code: <strong>{{ gameCode }}</strong></p>
+                </div>
+                
+                <div v-if="gameState === 'playing'" class="game-playing">
+                    <p>Game is in progress! Implement your quiz components here.</p>
                 </div>
             </div>
         </div>
+        
+        <!-- Connection Status Toast -->
+        <div v-if="showConnectionToast" class="connection-toast" :class="connectionToastType">
+            <span class="toast-icon">{{ connectionToastIcon }}</span>
+            <span class="toast-message">{{ connectionToastMessage }}</span>
+        </div>
     </div>
 
-    <!-- Load Components -->
-    <script src="components/UserAvatars.js"></script>
-    <script src="components/QuizQuestion.js"></script>
-    <script src="components/SidebarMenu.js"></script>
-    
-    <!-- Load Main App -->
-    <script src="app-components.js"></script>
+    <!-- Component Scripts -->
+    <script src="components/HomePage.js"></script>
+    <script src="components/JoinGameForm.js"></script>
+    <script src="components/ScoreDisplay.js"></script>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            components: {
+                'home-page': window.HomePage,
+                'join-game-form': window.JoinGameForm,
+                'score-display': window.ScoreDisplay
+            },
+            
+            data() {
+                return {
+                    // App State
+                    currentView: 'home', // 'home', 'game'
+                    
+                    // WebSocket configuration
+                    wsConfig: {
+                        serverUrl: null, // Auto-detect or set manually
+                        endpoint: '/playws'
+                    },
+                    
+                    // WebSocket connection
+                    websocket: null,
+                    isConnected: false,
+                    reconnectAttempts: 0,
+                    maxReconnectAttempts: 5,
+                    reconnectInterval: 3000,
+                    connectionStatus: 'Disconnected',
+                    
+                    // Game State
+                    gameCode: null,
+                    playerName: null,
+                    playerId: null,
+                    gameState: 'waiting', // 'waiting', 'playing', 'finished'
+                    
+                    // UI State
+                    showJoinGameForm: false,
+                    isJoining: false,
+                    
+                    // Statistics
+                    gameStats: {
+                        sampleQuestions: 1250,
+                        manualQuizzes: 320,
+                        totalScores: 2570,
+                        playersOnline: 45,
+                        gamesActive: 12
+                    },
+                    
+                    // Toast notifications
+                    showConnectionToast: false,
+                    connectionToastType: 'info',
+                    connectionToastMessage: '',
+                    connectionToastIcon: 'ℹ️'
+                }
+            },
+            
+            computed: {
+                wsUrl() {
+                    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    
+                    if (this.wsConfig.serverUrl) {
+                        return `${this.wsConfig.serverUrl}${this.wsConfig.endpoint}`;
+                    }
+                    
+                    // Auto-detect based on current environment
+                    const hostname = window.location.hostname;
+                    
+                    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '') {
+                        return `${wsProtocol}//127.0.0.1:8080${this.wsConfig.endpoint}`;
+                    } else if (hostname.includes('github.io') || hostname.includes('netlify')) {
+                        return `${wsProtocol}//your-api-server.com${this.wsConfig.endpoint}`;
+                    } else {
+                        const port = window.location.port ? `:${window.location.port}` : '';
+                        return `${wsProtocol}//${hostname}${port}${this.wsConfig.endpoint}`;
+                    }
+                }
+            },
+            
+            methods: {
+                // WebSocket Methods
+                connectWebSocket() {
+                    this.connectionStatus = 'Connecting...';
+                    this.showToast('info', 'Connecting to server...', 'ℹ️');
+                    
+                    try {
+                        this.websocket = new WebSocket(this.wsUrl);
+                        
+                        this.websocket.onopen = this.onWebSocketOpen;
+                        this.websocket.onmessage = this.onWebSocketMessage;
+                        this.websocket.onclose = this.onWebSocketClose;
+                        this.websocket.onerror = this.onWebSocketError;
+                        
+                        console.log('Attempting to connect to WebSocket:', this.wsUrl);
+                    } catch (error) {
+                        console.error('Failed to create WebSocket connection:', error);
+                        this.connectionStatus = 'Connection Failed';
+                        this.showToast('error', 'Failed to connect to server', '❌');
+                        this.handleReconnect();
+                    }
+                },
+                
+                onWebSocketOpen(event) {
+                    console.log('WebSocket connected successfully');
+                    this.isConnected = true;
+                    this.reconnectAttempts = 0;
+                    this.connectionStatus = 'Connected';
+                    this.showToast('success', 'Connected to server', '✅');
+                    
+                    // Generate a unique player ID if not already set
+                    if (!this.playerId) {
+                        this.playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+                    }
+                },
+                
+                onWebSocketMessage(event) {
+                    try {
+                        console.log('Received WebSocket message:', event.data);
+                        
+                        let gamePlayData;
+                        try {
+                            gamePlayData = JSON.parse(event.data);
+                        } catch (parseError) {
+                            console.log('Received non-JSON message:', event.data);
+                            return;
+                        }
+                        
+                        this.handleGamePlayMessage(gamePlayData);
+                    } catch (error) {
+                        console.error('Error processing WebSocket message:', error);
+                    }
+                },
+                
+                onWebSocketClose(event) {
+                    console.log('WebSocket connection closed:', event.code, event.reason);
+                    this.isConnected = false;
+                    this.connectionStatus = 'Disconnected';
+                    
+                    if (event.code !== 1000) {
+                        this.showToast('warning', 'Connection lost. Reconnecting...', '⚠️');
+                        this.handleReconnect();
+                    } else {
+                        this.showToast('info', 'Disconnected from server', 'ℹ️');
+                    }
+                },
+                
+                onWebSocketError(error) {
+                    console.error('WebSocket error:', error);
+                    this.isConnected = false;
+                    this.connectionStatus = 'Connection Error';
+                    this.showToast('error', 'Connection error occurred', '❌');
+                },
+                
+                handleReconnect() {
+                    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                        this.reconnectAttempts++;
+                        this.connectionStatus = `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`;
+                        
+                        setTimeout(() => {
+                            this.connectWebSocket();
+                        }, this.reconnectInterval);
+                    } else {
+                        this.connectionStatus = 'Connection Failed - Please Refresh';
+                        this.showToast('error', 'Connection failed. Please refresh the page.', '❌');
+                    }
+                },
+                
+                disconnectWebSocket() {
+                    if (this.websocket) {
+                        this.websocket.close(1000, 'User disconnected');
+                        this.websocket = null;
+                        this.isConnected = false;
+                    }
+                },
+                
+                // Game Methods
+                sendGamePlayAction(action, data = {}) {
+                    if (!this.isConnected || !this.websocket) {
+                        console.warn('WebSocket not connected, cannot send action:', action);
+                        return;
+                    }
+                    
+                    const gamePlay = {
+                        id: this.playerId,
+                        code: this.gameCode || '',
+                        action: action,
+                        ...data
+                    };
+                    
+                    this.websocket.send(JSON.stringify(gamePlay));
+                    console.log('Sent GamePlay action:', gamePlay);
+                },
+                
+                handleGamePlayMessage(gamePlayData) {
+                    console.log('Processing GamePlay message:', gamePlayData);
+                    
+                    // Handle different types of GamePlay messages
+                    if (gamePlayData.summary) {
+                        this.handleGameSummary(gamePlayData.summary);
+                    } else if (gamePlayData.command) {
+                        this.handleGameCommand(gamePlayData.command);
+                    } else if (gamePlayData.action) {
+                        this.handleGameAction(gamePlayData.action);
+                    }
+                },
+                
+                handleGameSummary(summary) {
+                    console.log('Game summary received:', summary);
+                    // Handle game over, player list updates, etc.
+                },
+                
+                handleGameCommand(command) {
+                    console.log('Game command received:', command);
+                    // Handle game commands from server
+                },
+                
+                handleGameAction(action) {
+                    console.log('Game action received:', action);
+                    // Handle server actions like game start, end, etc.
+                },
+                
+                // UI Event Handlers
+                showJoinForm() {
+                    this.showJoinGameForm = true;
+                },
+                
+                hideJoinForm() {
+                    this.showJoinGameForm = false;
+                    this.isJoining = false;
+                },
+                
+                showHostForm() {
+                    this.showToast('info', 'Host game feature coming soon!', 'ℹ️');
+                },
+                
+                handleJoinGame(gameData) {
+                    this.isJoining = true;
+                    this.playerName = gameData.playerName;
+                    this.gameCode = gameData.gameCode;
+                    
+                    // Send JOIN action to server
+                    this.sendGamePlayAction('JOIN', {
+                        playerName: this.playerName,
+                        gameCode: this.gameCode
+                    });
+                    
+                    // Switch to game view
+                    this.currentView = 'game';
+                    this.gameState = 'waiting';
+                    this.hideJoinForm();
+                    
+                    this.showToast('info', `Joining game ${this.gameCode}...`, '🎮');
+                },
+                
+                leaveGame() {
+                    if (this.gameCode) {
+                        this.sendGamePlayAction('LEAVE');
+                    }
+                    
+                    this.currentView = 'home';
+                    this.gameCode = null;
+                    this.playerName = null;
+                    this.gameState = 'waiting';
+                    this.isJoining = false;
+                    
+                    this.showToast('info', 'Left the game', 'ℹ️');
+                },
+                
+                // Toast Notifications
+                showToast(type, message, icon) {
+                    this.connectionToastType = type;
+                    this.connectionToastMessage = message;
+                    this.connectionToastIcon = icon;
+                    this.showConnectionToast = true;
+                    
+                    // Hide toast after 3 seconds
+                    setTimeout(() => {
+                        this.showConnectionToast = false;
+                    }, 3000);
+                }
+            },
+            
+            mounted() {
+                console.log('QuizUS Home Page initialized');
+                
+                // Initialize WebSocket connection
+                this.connectWebSocket();
+                
+                // Simulate updating stats periodically (for demo)
+                setInterval(() => {
+                    this.gameStats.playersOnline = Math.floor(Math.random() * 100) + 20;
+                    this.gameStats.gamesActive = Math.floor(Math.random() * 20) + 5;
+                }, 10000); // Update every 10 seconds
+            },
+            
+            beforeUnmount() {
+                this.disconnectWebSocket();
+            }
+        }).mount('#app');
+    </script>
 </body>
 </html>
