@@ -14,12 +14,13 @@ var (
 )
 
 func setConfig(cmd *cobra.Command) {
-	cmd.HasPersistentFlags()
-	pflag.Parse()
-
+	// Define flags before parsing
 	port = pflag.Int("port", 8080, "http port")
 	grpcPort = pflag.Int("grpc-port", 9090, "grpc port")
 	logLevel = pflag.String("log-level", "info", "log level (debug, info, warn, error)")
+	
+	cmd.HasPersistentFlags()
+	pflag.Parse()
 }
 
 func logParser(level string) log.Leveler {

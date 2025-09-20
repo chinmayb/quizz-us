@@ -15,9 +15,17 @@ var upgrader = websocket.Upgrader{
 		origin := r.Header.Get("Origin")
 		switch origin {
 		case "http://localhost:8090", // dev frontend
+			"http://localhost:8080", // server port
+			"http://127.0.0.1:8080", // server IP
 			"https://quizz.us": // production frontend
 			return true
+		case "": // Allow file:// origins (when opening HTML files directly)
+			return true
 		default:
+			// For development, allow localhost and 127.0.0.1 with any port
+			if r.Host == "127.0.0.1:8080" || r.Host == "localhost:8080" {
+				return true
+			}
 			return false
 		}
 	},

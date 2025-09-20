@@ -8,7 +8,10 @@ Features
 - Host a multiplayer quiz game
 - Play the game with many players!
 
-[Requirements](./docs/requirements.md)
+Requirements
+- Go 1.20+
+- Protobuf compiler (protoc)
+- Node.js (for frontend development)
 
 Internals
 - [Engine flows](./docs/engine.md)
