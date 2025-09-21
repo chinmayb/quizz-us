@@ -18,7 +18,7 @@ const HomePage = {
             <div class="hero-section">
                 <h1 class="main-title">QuizUS</h1>
                 <p class="subtitle">
-                    Quiz
+                    A Multiplayer Quiz Gaming Platform
                 </p>
             </div>
             

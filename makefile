@@ -4,6 +4,10 @@ server:
 client:
 	@go run main.go client
 
+.PHONY: run-frontend
+run-frontend:
+	@cd frontend &&  npm run dev
+
 buf:
 	buf generate
 

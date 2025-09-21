@@ -77,7 +77,7 @@ func WSHandler(ctx context.Context, log log.Logger, client pb.GamesClient) *http
 			for {
 				resp, err := stream.Recv()
 				if err != nil {
-					log.Error("gRPC receive error: %v", "", err)
+					log.Error("gRPC receive error", "reason", err)
 					ws.WriteMessage(websocket.CloseMessage, []byte("gRPC stream closed"))
 					return
 				}
@@ -85,7 +85,7 @@ func WSHandler(ctx context.Context, log log.Logger, client pb.GamesClient) *http
 				// FIXME
 				err = ws.WriteMessage(websocket.TextMessage, []byte(resp.String()))
 				if err != nil {
-					log.Error("WebSocket write error: %v", "", err)
+					log.Error("WebSocket write error", "reason", err)
 					return
 				}
 			}

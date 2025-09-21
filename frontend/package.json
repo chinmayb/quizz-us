@@ -1,0 +1,22 @@
+{
+  "name": "quizz-us-frontend",
+  "version": "1.0.0",
+  "description": "Frontend development server for QuizUS multiplayer quiz application",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "watch": "nodemon server.js"
+  },
+  "keywords": ["vue", "quiz", "multiplayer", "websocket"],
+  "author": "QuizUS Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "chokidar": "^3.5.3",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
