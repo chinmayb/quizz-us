@@ -116,6 +116,9 @@ message GamePlay {
 
   string code = 2;
 
+  // player name
+  string name = 6;
+
   oneof cmd {
     GamePlayAction action = 3;
     GameSummary summary = 4;

@@ -93,10 +93,11 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 		// If command is empty add treat it as heartbeat and add him to the registry
 		if in.GetAction() == pb.GamePlayAction_JOIN {
 			// shouldnt send the same
-			log.Info("Player joined", "player", in.GetId())
+			log.Info("Player joined", "player", in.GetId(), "name", in.GetName())
 			// TODO only host can initialize the game
 			initGame(stream.Context(), in.GetCode())
 			playObj.Player.Id = in.GetId()
+			playObj.Player.Name = in.GetName()
 
 			quiz.AddPlayerToRegistry(code, playObj)
 			// waiting for the question/result & send it to player
