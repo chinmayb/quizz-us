@@ -28,6 +28,15 @@
             @join-game="handleJoinGame"
             @cancel-join="hideJoinForm"
         ></join-game-form>
+
+        <!-- Host Game Form Modal -->
+        <host-game-form
+            v-if="showHostGameForm"
+            :is-connected="isConnected"
+            :is-hosting="isHosting"
+            @start-host="handleHostGame"
+            @cancel-host="hideHostForm"
+        ></host-game-form>
         
         <!-- Game View (when connected to a game) -->
         <div v-if="currentView === 'game'" class="game-container">
@@ -46,8 +55,15 @@
                     <p>Game Code: <strong>{{ gameCode }}</strong></p>
                 </div>
                 
-                <div v-if="gameState === 'playing'" class="game-playing">
-                    <p>Game is in progress! Implement your quiz components here.</p>
+                <div v-if="gameState === 'playing' && currentQuestion" class="game-playing">
+                    <quiz-question
+                        :question="currentQuestion"
+                        v-model:user-answer="userAnswer"
+                        :is-submitted="false"
+                        :show-result="false"
+                        :is-correct="false"
+                        @submit-answer="handleSubmitAnswer"
+                    ></quiz-question>
                 </div>
             </div>
         </div>
@@ -62,6 +78,8 @@
     <!-- Component Scripts -->
     <script src="components/HomePage.js"></script>
     <script src="components/JoinGameForm.js"></script>
+    <script src="components/HostGameForm.js"></script>
+    <script src="components/QuizQuestion.js"></script>
     <script src="components/ScoreDisplay.js"></script>
 
     <script>
@@ -71,6 +89,8 @@
             components: {
                 'home-page': window.HomePage,
                 'join-game-form': window.JoinGameForm,
+                'host-game-form': window.HostGameForm,
+                'quiz-question': window.QuizQuestion,
                 'score-display': window.ScoreDisplay
             },
             
@@ -99,9 +119,15 @@
                     playerId: null,
                     gameState: 'waiting', // 'waiting', 'playing', 'finished'
                     
+                    // Current question data
+                    currentQuestion: null,
+                    userAnswer: '',
+                    
                     // UI State
                     showJoinGameForm: false,
+                    showHostGameForm: false,
                     isJoining: false,
+                    isHosting: false,
                     
                     // Statistics
                     gameStats: {
@@ -276,7 +302,22 @@
                 
                 handleGameCommand(command) {
                     console.log('Game command received:', command);
-                    // Handle game commands from server
+                    
+                    // Update game state and store question
+                    if (command.question) {
+                        this.currentQuestion = {
+                            id: command.id,
+                            question: command.question,
+                            questionTime: command.question_time,
+                            correctAnswer: command.correct_answer // Backend sends this; will hide in UI
+                        };
+                        
+                        // Transition to playing state
+                        this.gameState = 'playing';
+                        this.userAnswer = '';
+                        
+                        console.log('Question loaded, transitioning to playing state:', this.currentQuestion);
+                    }
                 },
                 
                 handleGameAction(action) {
@@ -295,7 +336,12 @@
                 },
                 
                 showHostForm() {
-                    this.showToast('info', 'Host game feature coming soon!', 'ℹ️');
+                    this.showHostGameForm = true;
+                },
+
+                hideHostForm() {
+                    this.showHostGameForm = false;
+                    this.isHosting = false;
                 },
                 
                 handleJoinGame(gameData) {
@@ -316,6 +362,31 @@
                     
                     this.showToast('info', `Joining game ${this.gameCode}...`, '🎮');
                 },
+
+                handleHostGame(gameData) {
+                    if (!this.isConnected) {
+                        this.showToast('error', 'Connect to the server before hosting a game.', '❌');
+                        return;
+                    }
+
+                    this.isHosting = true;
+                    this.playerName = gameData.playerName;
+                    this.gameCode = gameData.gameCode;
+
+                    // Ensure host is registered as a player, then begin the game
+                    this.sendGamePlayAction('JOIN', {
+                        playerName: this.playerName,
+                        role: 'HOST'
+                    });
+
+                    this.sendGamePlayAction('BEGIN');
+
+                    this.currentView = 'game';
+                    this.gameState = 'waiting';
+                    this.hideHostForm();
+
+                    this.showToast('success', `Hosting game ${this.gameCode}. Waiting for players...`, '🎉');
+                },
                 
                 leaveGame() {
                     if (this.gameCode) {
@@ -326,9 +397,38 @@
                     this.gameCode = null;
                     this.playerName = null;
                     this.gameState = 'waiting';
+                    this.currentQuestion = null;
+                    this.userAnswer = '';
                     this.isJoining = false;
+                    this.isHosting = false;
                     
                     this.showToast('info', 'Left the game', 'ℹ️');
+                },
+                
+                // Game Actions
+                handleSubmitAnswer() {
+                    if (!this.userAnswer.trim() || !this.currentQuestion) {
+                        return;
+                    }
+                    
+                    console.log('Submitting answer:', this.userAnswer);
+                    
+                    // Send answer to backend via WebSocket
+                    const gamePlay = {
+                        id: this.playerId,
+                        code: this.gameCode,
+                        command: {
+                            id: this.currentQuestion.id,
+                            player_answer: this.userAnswer.trim(),
+                            question: this.currentQuestion.question,
+                            correct_answer: this.currentQuestion.correctAnswer
+                        }
+                    };
+                    
+                    this.websocket.send(JSON.stringify(gamePlay));
+                    console.log('Sent answer command:', gamePlay);
+                    
+                    this.showToast('info', 'Answer submitted!', '📝');
                 },
                 
                 // Toast Notifications

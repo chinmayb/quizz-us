@@ -6,7 +6,7 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
 
 ### Phase 1: Core Communication Layer
 
-- [ ] 1. Fix WebSocket-to-gRPC message serialization
+- [] 1. Fix WebSocket-to-gRPC message serialization
   - Create JSON struct types that map to protobuf GamePlay messages (GamePlayAction, GamePlayCommand, GameSummary)
   - Implement JSON unmarshaling in ws.go to parse incoming WebSocket messages
   - Implement protobuf-to-JSON marshaling for outgoing messages
@@ -22,6 +22,12 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
   - Add collision handling with retry logic
   - Write unit tests for code generation (format, uniqueness, randomness)
   - _Requirements: 2.2, 2.5_
+
+- [x] 3. [frontend] Add start game creation button
+  - Create a button on the home page to initiate game
+  - Call "Begin" command on click to start game creation flow
+     - `&pb.GamePlay_Action{Action: pb.GamePlayAction_BEGIN}}`
+     - This will be called from the host game component later [TO be done later]
 
 ### Phase 2: Game Creation and Hosting
 

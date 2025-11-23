@@ -27,16 +27,10 @@ window.QuizQuestion = {
   
   template: `
     <div class="question-container">
-      <h2 class="question-title">{{ question.title }}</h2>
+      <h2 class="question-title">Question #{{ question.id }}</h2>
       <div class="question-content">
-        <div class="question-image">
-          <img :src="question.image" :alt="question.title" v-if="question.image">
-          <div class="image-placeholder" v-else>
-            <span>📷 Question Image</span>
-          </div>
-        </div>
         <div class="question-text">
-          <p>{{ question.text }}</p>
+          <p>{{ question.question }}</p>
         </div>
       </div>
       
