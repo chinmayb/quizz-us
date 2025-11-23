@@ -1,9 +1,5 @@
 const JoinGameForm = {
     props: {
-        isConnected: {
-            type: Boolean,
-            default: false
-        },
         isJoining: {
             type: Boolean,
             default: false
@@ -77,12 +73,6 @@ const JoinGameForm = {
                         </div>
                     </div>
                     
-                    <!-- Connection Status -->
-                    <div v-if="!isConnected" class="connection-warning">
-                        <span class="warning-icon">⚠️</span>
-                        <span>Connecting to server...</span>
-                    </div>
-                    
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <button 
@@ -111,8 +101,7 @@ const JoinGameForm = {
     
     computed: {
         canJoin() {
-            return this.isConnected && 
-                   this.playerName.trim().length > 0 && 
+            return this.playerName.trim().length > 0 && 
                    this.gameCode.trim().length >= 6 && 
                    !this.isJoining;
         }

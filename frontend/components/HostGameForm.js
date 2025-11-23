@@ -1,9 +1,5 @@
 const HostGameForm = {
     props: {
-        isConnected: {
-            type: Boolean,
-            default: false
-        },
         isHosting: {
             type: Boolean,
             default: false
@@ -25,8 +21,7 @@ const HostGameForm = {
 
     computed: {
         canHost() {
-            return this.isConnected &&
-                   this.playerName.trim().length >= 2 &&
+            return this.playerName.trim().length >= 2 &&
                    /^[A-Z0-9]{6}$/.test(this.gameCode) &&
                    !this.isHosting;
         }
@@ -87,11 +82,6 @@ const HostGameForm = {
                         <div class="form-hint">
                             Share this 6-character code with players to join your game
                         </div>
-                    </div>
-
-                    <div v-if="!isConnected" class="connection-warning">
-                        <span class="warning-icon">⚠️</span>
-                        <span>Connecting to server...</span>
                     </div>
 
                     <div class="form-actions">
@@ -159,11 +149,6 @@ const HostGameForm = {
                 isValid = false;
             } else if (!/^[A-Z0-9]{6}$/.test(this.gameCode)) {
                 this.errors.gameCode = 'Game code must contain only letters and numbers';
-                isValid = false;
-            }
-
-            if (!this.isConnected) {
-                this.errors.gameCode = this.errors.gameCode || 'Connection required to host game';
                 isValid = false;
             }
 

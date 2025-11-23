@@ -14,8 +14,6 @@
         <!-- Home Page View -->
         <div v-if="currentView === 'home'" class="app-container">
             <home-page
-                :is-connected="isConnected"
-                :connection-status="connectionStatus"
                 @join-game="showJoinForm"
                 @host-game="showHostForm"
             ></home-page>
@@ -24,7 +22,6 @@
         <!-- Join Game Form Modal -->
         <join-game-form
             v-if="showJoinGameForm"
-            :is-connected="isConnected"
             :is-joining="isJoining"
             @join-game="handleJoinGame"
             @cancel-join="hideJoinForm"
@@ -33,7 +30,6 @@
         <!-- Host Game Form Modal -->
         <host-game-form
             v-if="showHostGameForm"
-            :is-connected="isConnected"
             :is-hosting="isHosting"
             @start-host="handleHostGame"
             @cancel-host="hideHostForm"
@@ -367,49 +363,84 @@
                     this.gameCode = gameData.gameCode;
                     this.isHost = false; // Joining players are not hosts
                     
-                    // Send JOIN action to server
-                    this.sendGamePlayAction('JOIN', {
-                        playerName: this.playerName,
-                        gameCode: this.gameCode
-                    });
+                    // Establish WebSocket connection first
+                    this.showToast('info', 'Connecting to server...', 'ℹ️');
+                    this.connectWebSocket();
                     
-                    // Switch to game view and stay in waiting state
-                    this.currentView = 'game';
-                    this.gameState = 'waiting';
-                    this.hideJoinForm();
+                    // Wait for connection before joining
+                    const checkConnection = setInterval(() => {
+                        if (this.isConnected) {
+                            clearInterval(checkConnection);
+                            
+                            // Send JOIN action to server
+                            this.sendGamePlayAction('JOIN', {
+                                playerName: this.playerName,
+                                gameCode: this.gameCode
+                            });
+                            
+                            // Switch to game view and stay in waiting state
+                            this.currentView = 'game';
+                            this.gameState = 'waiting';
+                            this.hideJoinForm();
+                            
+                            // Update URL with game code
+                            this.updateUrlWithGameCode(this.gameCode);
+                            
+                            this.showToast('info', `Joined game ${this.gameCode}. Waiting for host...`, '🎮');
+                        }
+                    }, 100); // Check every 100ms
                     
-                    // Update URL with game code
-                    this.updateUrlWithGameCode(this.gameCode);
-                    
-                    this.showToast('info', `Joined game ${this.gameCode}. Waiting for host...`, '🎮');
+                    // Timeout after 10 seconds
+                    setTimeout(() => {
+                        if (!this.isConnected) {
+                            clearInterval(checkConnection);
+                            this.isJoining = false;
+                            this.showToast('error', 'Failed to connect to server. Please try again.', '❌');
+                        }
+                    }, 10000);
                 },
 
                 handleHostGame(gameData) {
-                    if (!this.isConnected) {
-                        this.showToast('error', 'Connect to the server before hosting a game.', '❌');
-                        return;
-                    }
-
                     this.isHosting = true;
                     this.playerName = gameData.playerName;
                     this.gameCode = gameData.gameCode;
                     this.isHost = true; // Mark this user as the host
 
-                    // Send JOIN action to register host as a player
-                    this.sendGamePlayAction('JOIN', {
-                        playerName: this.playerName,
-                        role: 'HOST'
-                    });
+                    // Establish WebSocket connection first
+                    this.showToast('info', 'Connecting to server...', 'ℹ️');
+                    this.connectWebSocket();
+                    
+                    // Wait for connection before hosting
+                    const checkConnection = setInterval(() => {
+                        if (this.isConnected) {
+                            clearInterval(checkConnection);
+                            
+                            // Send JOIN action to register host as a player
+                            this.sendGamePlayAction('JOIN', {
+                                playerName: this.playerName,
+                                role: 'HOST'
+                            });
 
-                    // Switch to game view but don't send BEGIN yet
-                    this.currentView = 'game';
-                    this.gameState = 'waiting';
-                    this.hideHostForm();
+                            // Switch to game view but don't send BEGIN yet
+                            this.currentView = 'game';
+                            this.gameState = 'waiting';
+                            this.hideHostForm();
 
-                    // Update URL with game code
-                    this.updateUrlWithGameCode(this.gameCode);
+                            // Update URL with game code
+                            this.updateUrlWithGameCode(this.gameCode);
 
-                    this.showToast('success', `Hosting game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
+                            this.showToast('success', `Hosting game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
+                        }
+                    }, 100); // Check every 100ms
+                    
+                    // Timeout after 10 seconds
+                    setTimeout(() => {
+                        if (!this.isConnected) {
+                            clearInterval(checkConnection);
+                            this.isHosting = false;
+                            this.showToast('error', 'Failed to connect to server. Please try again.', '❌');
+                        }
+                    }, 10000);
                 },
                 
                 startGame() {
@@ -427,6 +458,9 @@
                     if (this.gameCode) {
                         this.sendGamePlayAction('END');
                     }
+                    
+                    // Disconnect WebSocket when leaving game
+                    this.disconnectWebSocket();
                     
                     this.currentView = 'home';
                     this.gameCode = null;
@@ -553,8 +587,8 @@
             mounted() {
                 console.log('QuizUS Home Page initialized');
                 
-                // Initialize WebSocket connection
-                this.connectWebSocket();
+                // DO NOT connect WebSocket on homepage mount
+                // Connection will be established only when joining/hosting a game
                 
                 // Handle browser back/forward buttons
                 window.addEventListener('popstate', this.handleBrowserNavigation);
