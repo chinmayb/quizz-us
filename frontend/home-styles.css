@@ -547,7 +547,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .form-actions .btn {

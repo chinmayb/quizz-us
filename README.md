@@ -8,11 +8,21 @@ Quizz-Us lets you host and play quiz games with multiple players in real-time. C
 
 ## Quick Start
 
-**Prerequisites:**
-- Go 1.20+
-- Node.js
+### Option 1: Using Docker (Recommended)
 
-**Run the game:**
+**Prerequisites:** Docker and Docker Compose
+
+```bash
+docker-compose up
+```
+
+Then open your browser to:
+- Frontend: http://localhost:3001
+- Backend API: http://localhost:8080
+
+### Option 2: Local Development
+
+**Prerequisites:** Go 1.20+ and Node.js
 
 1. Start the backend:
    ```bash

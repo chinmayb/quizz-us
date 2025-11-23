@@ -27,6 +27,7 @@ func initGame(ctx context.Context, code string) {
 	gameChan := make(chan quiz.GamePro)
 	ansChan := make(chan quiz.PlayerObj)
 	p := quiz.NewGameProcessor(gameChan, ansChan)
+	p.code = code
 
 	// ADD it to the in memory registry
 	if alreadyExists := quiz.AddGame(code, p); alreadyExists {

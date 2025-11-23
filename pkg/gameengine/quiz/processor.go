@@ -135,12 +135,14 @@ func NewGameProcessor(gameChan chan GamePro, ansChan chan PlayerObj) *Game {
 	return &Game{
 		gp,
 		players,
+		"",
 	}
 }
 
 type Game struct {
 	GamePro gameProcessor
 	players PlayersMap
+	Code    string
 }
 
 type gameProcessor struct {
@@ -151,7 +153,7 @@ type gameProcessor struct {
 }
 
 func (g *Game) Process(ctx context.Context) error {
-	log.Info("Game processor started")
+	log.Debug("Game about to begin", "code", g.Code)
 	for {
 		select {
 		// TODO crashes needs to be handled from a reconciler if a game is running & stuck for a while
