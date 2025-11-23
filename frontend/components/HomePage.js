@@ -9,9 +9,9 @@ const HomePage = {
             default: 'Disconnected'
         }
     },
-    
-    emits: ['join-game', 'host-game'],
-    
+
+    emits: ['Join-Game', 'Host-Game'],
+
     template: `
         <div class="home-page">
             <!-- Hero Section -->
@@ -27,18 +27,18 @@ const HomePage = {
                 <div class="action-buttons">
                     <button 
                         class="btn btn-join"
-                        @click="$emit('join-game')"
+                        @click="$emit('Join-Game')"
                         :disabled="!isConnected"
                     >
-                        join
+                        Join
                     </button>
                     
                     <button 
                         class="btn btn-host"
-                        @click="$emit('host-game')"
+                        @click="$emit('Host-Game')"
                         :disabled="!isConnected"
                     >
-                        host
+                        Host
                     </button>
                 </div>
                 

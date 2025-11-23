@@ -188,37 +188,38 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 25px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    gap: 0.3rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 500;
     margin: 0 auto;
-    max-width: 300px;
-    backdrop-filter: blur(10px);
+    max-width: 150px;
+    backdrop-filter: blur(5px);
+    opacity: 0.8;
 }
 
 .status-connected {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-    border: 2px solid rgba(76, 175, 80, 0.3);
+    background: rgba(76, 175, 80, 0.06);
+    color: rgba(76, 175, 80, 0.8);
+    border: 1px solid rgba(76, 175, 80, 0.2);
 }
 
 .status-connecting {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    background: rgba(255, 193, 7, 0.06);
+    color: rgba(255, 193, 7, 0.8);
+    border: 1px solid rgba(255, 193, 7, 0.2);
 }
 
 .status-disconnected {
-    background: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-    border: 2px solid rgba(244, 67, 54, 0.3);
+    background: rgba(244, 67, 54, 0.06);
+    color: rgba(244, 67, 54, 0.8);
+    border: 1px solid rgba(244, 67, 54, 0.2);
 }
 
 .status-indicator {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: currentColor;
     animation: pulse 2s infinite;

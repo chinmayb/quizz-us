@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizUS - Multiplayer Quiz Platform</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="home-styles.css">
 </head>
@@ -68,6 +69,8 @@
                 <div v-if="gameState === 'playing' && currentQuestion" class="game-playing">
                     <quiz-question
                         :question="currentQuestion"
+                        :question-number="currentQuestionNumber"
+                        :total-questions="totalQuestions"
                         v-model:user-answer="userAnswer"
                         :is-submitted="false"
                         :show-result="false"
@@ -132,6 +135,8 @@
                     
                     // Current question data
                     currentQuestion: null,
+                    currentQuestionNumber: 1,
+                    totalQuestions: 10,
                     userAnswer: '',
                     
                     // UI State
@@ -373,6 +378,9 @@
                     this.gameState = 'waiting';
                     this.hideJoinForm();
                     
+                    // Update URL with game code
+                    this.updateUrlWithGameCode(this.gameCode);
+                    
                     this.showToast('info', `Joined game ${this.gameCode}. Waiting for host...`, '🎮');
                 },
 
@@ -397,6 +405,9 @@
                     this.currentView = 'game';
                     this.gameState = 'waiting';
                     this.hideHostForm();
+
+                    // Update URL with game code
+                    this.updateUrlWithGameCode(this.gameCode);
 
                     this.showToast('success', `Hosting game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
                 },
@@ -426,6 +437,9 @@
                     this.userAnswer = '';
                     this.isJoining = false;
                     this.isHosting = false;
+                    
+                    // Clear URL and return to home
+                    this.updateUrlToHome();
                     
                     this.showToast('info', 'Left the game', 'ℹ️');
                 },
@@ -467,6 +481,72 @@
                     setTimeout(() => {
                         this.showConnectionToast = false;
                     }, 3000);
+                },
+                
+                // URL Management Methods
+                updateUrlWithGameCode(gameCode) {
+                    // Update browser URL without page reload
+                    const newUrl = `${window.location.origin}/${gameCode}`;
+                    window.history.pushState({ gameCode, view: 'game' }, '', newUrl);
+                    
+                    // Update page title
+                    document.title = `Game ${gameCode} - QuizUS`;
+                    
+                    console.log('URL updated to:', newUrl);
+                },
+                
+                updateUrlToHome() {
+                    // Return to home URL
+                    const newUrl = window.location.origin + window.location.pathname.split('/')[0];
+                    window.history.pushState({ view: 'home' }, '', window.location.origin);
+                    
+                    // Reset page title
+                    document.title = 'QuizUS - Multiplayer Quiz Platform';
+                    
+                    console.log('URL updated to home:', window.location.origin);
+                },
+                
+                handleBrowserNavigation(event) {
+                    // Handle browser back/forward buttons
+                    console.log('Browser navigation detected:', event.state);
+                    
+                    if (event.state && event.state.view === 'home') {
+                        // Navigate back to home
+                        this.leaveGame();
+                    } else if (event.state && event.state.gameCode) {
+                        // Navigate to game (if already in a game, this maintains state)
+                        // If not in game, show a message or redirect
+                        if (!this.gameCode) {
+                            this.showToast('info', 'Please join or host a game to continue', 'ℹ️');
+                            this.currentView = 'home';
+                            this.updateUrlToHome();
+                        }
+                    } else {
+                        // No state, probably initial load or direct URL access
+                        this.handleDirectUrlAccess();
+                    }
+                },
+                
+                handleDirectUrlAccess() {
+                    // Check if URL has a game code (e.g., /ABC123)
+                    const path = window.location.pathname;
+                    const pathParts = path.split('/').filter(p => p.length > 0);
+                    
+                    if (pathParts.length > 0) {
+                        const potentialGameCode = pathParts[0].toUpperCase();
+                        
+                        // Basic validation: game codes are typically 4-8 uppercase alphanumeric
+                        if (potentialGameCode.length >= 4 && /^[A-Z0-9]+$/.test(potentialGameCode)) {
+                            console.log('Direct URL access detected for game:', potentialGameCode);
+                            
+                            // Show join form with pre-filled game code
+                            this.showToast('info', `Enter your name to join game ${potentialGameCode}`, '🎮');
+                            // You could auto-populate the game code here if you modify the JoinGameForm
+                        } else {
+                            // Invalid game code format, go to home
+                            this.updateUrlToHome();
+                        }
+                    }
                 }
             },
             
@@ -476,6 +556,17 @@
                 // Initialize WebSocket connection
                 this.connectWebSocket();
                 
+                // Handle browser back/forward buttons
+                window.addEventListener('popstate', this.handleBrowserNavigation);
+                
+                // Handle direct URL access (e.g., user opens /ABC123)
+                this.handleDirectUrlAccess();
+                
+                // Set initial history state for home page
+                if (!window.history.state) {
+                    window.history.replaceState({ view: 'home' }, '', window.location.href);
+                }
+                
                 // Simulate updating stats periodically (for demo)
                 setInterval(() => {
                     this.gameStats.playersOnline = Math.floor(Math.random() * 100) + 20;
@@ -484,6 +575,8 @@
             },
             
             beforeUnmount() {
+                // Clean up event listeners
+                window.removeEventListener('popstate', this.handleBrowserNavigation);
                 this.disconnectWebSocket();
             }
         }).mount('#app');

@@ -5,6 +5,14 @@ window.QuizQuestion = {
       type: Object,
       required: true
     },
+    questionNumber: {
+      type: Number,
+      default: 1
+    },
+    totalQuestions: {
+      type: Number,
+      default: null
+    },
     userAnswer: {
       type: String,
       default: ''
@@ -26,48 +34,70 @@ window.QuizQuestion = {
   emits: ['update:userAnswer', 'submit-answer', 'next-question'],
   
   template: `
-    <div class="question-container">
-      <h2 class="question-title">Question #{{ question.id }}</h2>
-      <div class="question-content">
-        <div class="question-text">
-          <p>{{ question.question }}</p>
+    <div class="quiz-question-card">
+      <!-- Question Header -->
+      <div class="question-header">
+        <div class="question-number-section">
+          <h2 class="question-number">Question #{{ questionNumber }}</h2>
+          <p v-if="totalQuestions" class="question-progress">of {{ totalQuestions }} questions</p>
         </div>
       </div>
       
-      <!-- Answer Input -->
+      <div class="question-divider"></div>
+      
+      <!-- Question Content -->
+      <div class="question-body">
+        <div class="question-text-container">
+          <p class="question-text">{{ question.question || question.text }}</p>
+        </div>
+        
+        <!-- Optional Question Image -->
+        <div v-if="question.image" class="question-image-container">
+          <img :src="question.image" :alt="'Question ' + questionNumber" class="question-image" />
+        </div>
+      </div>
+      
+      <!-- Answer Section -->
       <div class="answer-section">
-        <label for="answer-input" class="input-label">Your Answer</label>
-        <div class="input-container">
+        <label for="answer-input" class="answer-label">Your Answer</label>
+        <div class="answer-input-group">
           <input 
             type="text" 
             id="answer-input"
             :value="userAnswer"
             @input="$emit('update:userAnswer', $event.target.value)"
-            @keyup.enter="$emit('submit-answer')"
+            @keyup.enter="handleSubmit"
             placeholder="Type your answer here..."
-            class="answer-input"
+            class="answer-input-field"
             :disabled="isSubmitted"
+            :class="{ 'disabled': isSubmitted }"
           >
           <button 
-            @click="$emit('submit-answer')" 
-            class="submit-button" 
+            @click="handleSubmit" 
+            class="submit-btn" 
             :disabled="!canSubmit"
+            :class="{ 'disabled': !canSubmit }"
           >
-            {{ isSubmitted ? 'Submitted' : 'Submit' }}
+            {{ submitButtonText }}
           </button>
         </div>
         
         <!-- Result Display -->
-        <div v-if="showResult" :class="['result-message', resultClass]">
-          {{ resultMessage }}
-        </div>
+        <transition name="result-fade">
+          <div v-if="showResult" :class="['result-feedback', resultClass]">
+            <span class="result-icon">{{ resultIcon }}</span>
+            <span class="result-text">{{ resultMessage }}</span>
+          </div>
+        </transition>
         
         <!-- Next Question Button -->
-        <div v-if="showResult" class="next-question-section">
-          <button @click="$emit('next-question')" class="next-button">
-            Next Question
-          </button>
-        </div>
+        <transition name="button-fade">
+          <div v-if="showResult" class="next-question-container">
+            <button @click="$emit('next-question')" class="next-question-btn">
+              Next Question →
+            </button>
+          </div>
+        </transition>
       </div>
     </div>
   `,
@@ -77,14 +107,33 @@ window.QuizQuestion = {
       return this.userAnswer.trim().length > 0 && !this.isSubmitted;
     },
     
+    submitButtonText() {
+      if (this.isSubmitted) return '✓ Submitted';
+      return 'Submit';
+    },
+    
     resultMessage() {
       if (!this.showResult) return '';
-      return this.isCorrect ? 'Correct! 🎉' : `Incorrect. The answer is: ${this.question.correctAnswer}`;
+      if (this.isCorrect) return 'Correct! Well done!';
+      const correctAnswer = this.question.correctAnswer || this.question.answer;
+      return correctAnswer ? `The correct answer is: ${correctAnswer}` : 'Incorrect';
+    },
+    
+    resultIcon() {
+      return this.isCorrect ? '🎉' : '❌';
     },
     
     resultClass() {
       if (!this.showResult) return '';
-      return this.isCorrect ? 'result-correct' : 'result-incorrect';
+      return this.isCorrect ? 'correct' : 'incorrect';
+    }
+  },
+  
+  methods: {
+    handleSubmit() {
+      if (this.canSubmit) {
+        this.$emit('submit-answer');
+      }
     }
   }
 };

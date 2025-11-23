@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Question Preview - QuizUS</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            padding: 40px 20px;
+        }
+        .preview-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .preview-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1E1E1E;
+        }
+        .preview-header p {
+            color: #757575;
+            font-size: 14px;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .controls h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .control-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .control-group input[type="number"] {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #D9D9D9;
+            border-radius: 4px;
+        }
+        .control-group button {
+            padding: 8px 16px;
+            background: #1E1E1E;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .control-group button:hover {
+            background: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="preview-container">
+            <div class="preview-header">
+                <h1>🎯 QuizQuestion Component Preview</h1>
+                <p>Enhanced design based on game_page.svg mockup</p>
+            </div>
+
+            <div class="controls">
+                <h3>Controls</h3>
+                <div class="control-group">
+                    <label>
+                        Question #:
+                        <input type="number" v-model.number="questionNumber" min="1" max="20">
+                    </label>
+                    <label>
+                        Total:
+                        <input type="number" v-model.number="totalQuestions" min="1" max="50">
+                    </label>
+                </div>
+                <div class="control-group">
+                    <button @click="toggleSubmitted">{{ isSubmitted ? 'Reset' : 'Simulate Submit' }}</button>
+                    <button @click="toggleResult">{{ showResult ? 'Hide Result' : 'Show Result' }}</button>
+                    <button @click="isCorrect = !isCorrect" :disabled="!showResult">
+                        {{ isCorrect ? 'Make Incorrect' : 'Make Correct' }}
+                    </button>
+                </div>
+            </div>
+
+            <quiz-question
+                :question="sampleQuestion"
+                :question-number="questionNumber"
+                :total-questions="totalQuestions"
+                v-model:user-answer="userAnswer"
+                :is-submitted="isSubmitted"
+                :show-result="showResult"
+                :is-correct="isCorrect"
+                @submit-answer="handleSubmit"
+                @next-question="handleNext"
+            ></quiz-question>
+        </div>
+    </div>
+
+    <script src="components/QuizQuestion.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            components: {
+                'quiz-question': window.QuizQuestion
+            },
+            
+            data() {
+                return {
+                    sampleQuestion: {
+                        id: 1,
+                        question: "What is the chemical symbol for water?",
+                        text: "What is the chemical symbol for water?",
+                        answer: "H2O",
+                        correctAnswer: "H2O"
+                    },
+                    questionNumber: 1,
+                    totalQuestions: 10,
+                    userAnswer: '',
+                    isSubmitted: false,
+                    showResult: false,
+                    isCorrect: false
+                }
+            },
+            
+            methods: {
+                handleSubmit() {
+                    console.log('Submit answer:', this.userAnswer);
+                    this.isSubmitted = true;
+                    
+                    // Simulate answer checking
+                    setTimeout(() => {
+                        this.showResult = true;
+                        this.isCorrect = this.userAnswer.toLowerCase().trim() === 'h2o';
+                    }, 500);
+                },
+                
+                handleNext() {
+                    console.log('Next question');
+                    this.questionNumber++;
+                    this.userAnswer = '';
+                    this.isSubmitted = false;
+                    this.showResult = false;
+                    this.isCorrect = false;
+                    
+                    // Rotate through sample questions
+                    const questions = [
+                        { question: "What is the chemical symbol for water?", answer: "H2O" },
+                        { question: "What is the capital of France?", answer: "Paris" },
+                        { question: "Who painted the Mona Lisa?", answer: "Leonardo da Vinci" },
+                        { question: "What is 2 + 2?", answer: "4" }
+                    ];
+                    
+                    const q = questions[(this.questionNumber - 1) % questions.length];
+                    this.sampleQuestion = {
+                        id: this.questionNumber,
+                        question: q.question,
+                        text: q.question,
+                        answer: q.answer,
+                        correctAnswer: q.answer
+                    };
+                },
+                
+                toggleSubmitted() {
+                    if (this.isSubmitted) {
+                        this.isSubmitted = false;
+                        this.showResult = false;
+                        this.isCorrect = false;
+                    } else {
+                        this.handleSubmit();
+                    }
+                },
+                
+                toggleResult() {
+                    this.showResult = !this.showResult;
+                    if (this.showResult) {
+                        this.isSubmitted = true;
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
