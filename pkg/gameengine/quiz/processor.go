@@ -230,10 +230,11 @@ func broadCastQuestion(ctx context.Context, code string, q QuizEnginer) error {
 	data := <-quizdata
 	for _, player := range players {
 		// fan out the quiz questions to players
-		go func() {
-			log.Debug("sending question to", "player", player.Player.Id)
-			player.QuestionForPlayer <- data
-		}()
+		p := player
+		go func(pl *PlayerObj) {
+			log.Debug("sending question to", "player", pl.Player.Id)
+			pl.QuestionForPlayer <- data
+		}(p)
 	}
 	return nil
 }
@@ -244,9 +245,10 @@ func broadCastResult(_ context.Context, code string, q QuizEnginer) error {
 	// TODO add result from DB
 	for _, player := range players {
 		// fan out the quiz questions to players
-		go func() {
-			player.Result <- nil
-		}()
+		p := player
+		go func(pl *PlayerObj) {
+			pl.Result <- nil
+		}(p)
 	}
 	return nil
 }

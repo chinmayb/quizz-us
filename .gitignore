@@ -1,6 +1,7 @@
 .vscode/
 vendor
 .trunk/
+.github
 gen/go/.trunk
 
 frontend/node_modules/

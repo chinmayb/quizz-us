@@ -10,6 +10,7 @@ import (
 	pb "github.com/chinmayb/quizz-us/gen/go/api"
 	"github.com/chinmayb/quizz-us/pkg/data"
 	"github.com/chinmayb/quizz-us/pkg/gameengine/quiz"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func NewPlayServer(log *log.Logger) pb.GamesServer {
@@ -34,7 +35,11 @@ func initGame(ctx context.Context, code string) {
 	}
 
 	// should start only once
-	go p.Process(ctx)
+	go func() {
+		if err := p.Process(ctx); err != nil {
+			log.Error("game processor stopped", "err", err, "gameID", code)
+		}
+	}()
 }
 
 /*
@@ -102,9 +107,13 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 					case quizQuestion := <-playObj.QuestionForPlayer:
 						log.Info("Sending question to player", "player", playObj.Player.Id)
 						out := &pb.GamePlay{
+							Id:   playObj.Player.Id,
+							Code: code,
 							Cmd: &pb.GamePlay_Command{Command: &pb.GamePlayCommand{
-								Id:            quizQuestion.Id,
-								Question:      quizQuestion.Question,
+								Id:           quizQuestion.Id,
+								Question:     quizQuestion.Question,
+								QuestionTime: timestamppb.Now(),
+								// TODO: do not expose correct answer until results phase
 								CorrectAnswer: quizQuestion.Answer,
 							}},
 						}
