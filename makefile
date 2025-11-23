@@ -1,7 +1,9 @@
-server:
+run-backend:
 	@go run main.go serve
 
-client:
+# to work without the frontend
+.PHONY: sample-client
+sample-client:
 	@go run main.go client
 
 .PHONY: run-frontend
