@@ -27,7 +27,7 @@ func initGame(ctx context.Context, code string) {
 	gameChan := make(chan quiz.GamePro)
 	ansChan := make(chan quiz.PlayerObj)
 	p := quiz.NewGameProcessor(gameChan, ansChan)
-	p.code = code
+	p.Code = code
 
 	// ADD it to the in memory registry
 	if alreadyExists := quiz.AddGame(code, p); alreadyExists {
@@ -171,6 +171,13 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			gp := quiz.GamePro{Code: code}
 			p.GamePro.BeginGame <- gp
 			log.Info("sent")
+		}
+
+		// Check if the player left
+		if in.GetAction() == pb.GamePlayAction_END {
+			log.Info("player left, ta ta ", "ID", in.GetId())
+			quiz.RemovePlayerFromRegistry(code, in.GetId())
+			continue
 		}
 
 		if in.GetCommand().GetPlayerAnswer() != "" {

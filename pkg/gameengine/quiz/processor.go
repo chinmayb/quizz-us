@@ -198,13 +198,12 @@ func (g *Game) Play(ctx context.Context, code string) error {
 				log.Info("Wrong answer")
 				continue
 			}
-			log.Info("Right answer")
+			log.Info("Right answer from player", "player", playerobj.Player.Id)
 			// TODO update the score in the DB
 			// add a logic to give more points for faster answers
 			playerobj.Player.Score++
 			// TODO notify all the players that they one player has answered the question
 			// TODO check if all answered right if so send it to that channel
-			//
 
 		// this is added to send the question immediately after every one has given the right answer
 		case <-g.GamePro.areAllAnsweredRight:
