@@ -130,6 +130,7 @@ func WSHandler(ctx context.Context, log log.Logger, client pb.GamesClient) *http
 type websocketIncomingMessage struct {
 	ID      string                    `json:"id"`
 	Code    string                    `json:"code"`
+	Name    string                    `json:"name,omitempty"`
 	Action  string                    `json:"action,omitempty"`
 	Command *websocketIncomingCommand `json:"command,omitempty"`
 }
@@ -174,6 +175,7 @@ func parseWebSocketMessage(data []byte) (*pb.GamePlay, error) {
 	gamePlay := &pb.GamePlay{
 		Id:   msg.ID,
 		Code: msg.Code,
+		Name: msg.Name,
 	}
 
 	if msg.Command != nil {

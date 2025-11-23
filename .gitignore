@@ -2,6 +2,7 @@
 vendor
 .trunk/
 .github
+quizz-us
 gen/go/.trunk
 
 frontend/node_modules/
