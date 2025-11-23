@@ -629,6 +629,18 @@ h1, h2, h3, h4, h5, h6 {
     margin: 2rem auto;
 }
 
+.player-name-display {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+}
+
+.start-game-btn {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    padding: 1.2rem 2.5rem;
+}
+
 /* Toast Notifications */
 .connection-toast {
     position: fixed;

@@ -50,9 +50,19 @@
             
             <div class="game-content">
                 <div v-if="gameState === 'waiting'" class="waiting-room">
-                    <h3>Waiting for game to start...</h3>
+                    <h3>{{ isHost ? 'Waiting for players to join...' : 'Waiting for host to start the game...' }}</h3>
                     <div class="loading-spinner"></div>
                     <p>Game Code: <strong>{{ gameCode }}</strong></p>
+                    <p class="player-name-display">You: <strong>{{ playerName }}</strong></p>
+                    
+                    <!-- Host-only start button -->
+                    <button 
+                        v-if="isHost" 
+                        @click="startGame" 
+                        class="btn btn-primary start-game-btn"
+                    >
+                        Start Game
+                    </button>
                 </div>
                 
                 <div v-if="gameState === 'playing' && currentQuestion" class="game-playing">
@@ -117,6 +127,7 @@
                     gameCode: null,
                     playerName: null,
                     playerId: null,
+                    isHost: false, // Track if current user is the host
                     gameState: 'waiting', // 'waiting', 'playing', 'finished'
                     
                     // Current question data
@@ -348,6 +359,7 @@
                     this.isJoining = true;
                     this.playerName = gameData.playerName;
                     this.gameCode = gameData.gameCode;
+                    this.isHost = false; // Joining players are not hosts
                     
                     // Send JOIN action to server
                     this.sendGamePlayAction('JOIN', {
@@ -355,12 +367,12 @@
                         gameCode: this.gameCode
                     });
                     
-                    // Switch to game view
+                    // Switch to game view and stay in waiting state
                     this.currentView = 'game';
                     this.gameState = 'waiting';
                     this.hideJoinForm();
                     
-                    this.showToast('info', `Joining game ${this.gameCode}...`, '🎮');
+                    this.showToast('info', `Joined game ${this.gameCode}. Waiting for host...`, '🎮');
                 },
 
                 handleHostGame(gameData) {
@@ -372,20 +384,31 @@
                     this.isHosting = true;
                     this.playerName = gameData.playerName;
                     this.gameCode = gameData.gameCode;
+                    this.isHost = true; // Mark this user as the host
 
-                    // Ensure host is registered as a player, then begin the game
+                    // Send JOIN action to register host as a player
                     this.sendGamePlayAction('JOIN', {
                         playerName: this.playerName,
                         role: 'HOST'
                     });
 
-                    this.sendGamePlayAction('BEGIN');
-
+                    // Switch to game view but don't send BEGIN yet
                     this.currentView = 'game';
                     this.gameState = 'waiting';
                     this.hideHostForm();
 
-                    this.showToast('success', `Hosting game ${this.gameCode}. Waiting for players...`, '🎉');
+                    this.showToast('success', `Hosting game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
+                },
+                
+                startGame() {
+                    if (!this.isHost) {
+                        this.showToast('error', 'Only the host can start the game.', '❌');
+                        return;
+                    }
+                    
+                    console.log('Host starting game...');
+                    this.sendGamePlayAction('BEGIN');
+                    this.showToast('info', 'Starting game...', '�');
                 },
                 
                 leaveGame() {
@@ -396,6 +419,7 @@
                     this.currentView = 'home';
                     this.gameCode = null;
                     this.playerName = null;
+                    this.isHost = false;
                     this.gameState = 'waiting';
                     this.currentQuestion = null;
                     this.userAnswer = '';
