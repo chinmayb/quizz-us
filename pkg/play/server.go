@@ -104,6 +104,9 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 			playObj.Player.Id = in.GetId()
 			playObj.Player.Name = in.GetName()
 
+			_, playerCancel := context.WithCancel(stream.Context())
+			playObj.SetCancelFunc(playerCancel)
+
 			quiz.AddPlayerToRegistry(code, playObj)
 			// waiting for the question/result & send it to player
 			// should happen only once when the player joins
@@ -144,17 +147,21 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 						}
 					case <-stream.Context().Done():
 						log.Info("player exited", "ID", in.GetId())
-						// remove the player from the registry
-						quiz.RemovePlayerFromRegistry(code, playObj.Player.Id)
+						quiz.DisconnectPlayer(code, playObj.Player.Id)
 
 						players, err := quiz.GetAllPlayers(code)
 						if err != nil {
 							return
 						}
 						log.Info("game registry", "players", players)
-						// check if all players are left (TODO add some timeout)
-						if len(players) == 0 {
-							log.Info("no players left, removing the game")
+						activeCount := 0
+						for _, pl := range players {
+							if pl.Player.Status != pb.PlayerStatus_DISCONNECTED {
+								activeCount++
+							}
+						}
+						if activeCount == 0 {
+							log.Info("no active players left, removing the game")
 							quiz.RemoveGame(code)
 						}
 						return
