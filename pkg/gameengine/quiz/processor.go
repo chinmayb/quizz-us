@@ -316,6 +316,31 @@ func GetLastQuestion(gameID string) *data.QuizData {
 	return game.lastQuestion
 }
 
+func RejoinPlayer(gameID string, playerID string, newQ chan *data.QuizData, newResult chan *pb.GameSummary, newCancel context.CancelFunc) (*data.QuizData, bool) {
+	GameRegistry.mu.Lock()
+	game, ok := GameRegistry.games[gameID]
+	if !ok {
+		GameRegistry.mu.Unlock()
+		return nil, false
+	}
+	p, ok := game.players[playerID]
+	if !ok {
+		GameRegistry.mu.Unlock()
+		return nil, false
+	}
+	if p.cancelCtx != nil {
+		p.cancelCtx()
+	}
+	p.QuestionForPlayer = newQ
+	p.Result = newResult
+	p.cancelCtx = newCancel
+	p.Player.Status = pb.PlayerStatus_PLAYING
+	GameRegistry.mu.Unlock()
+
+	lastQ := GetLastQuestion(gameID)
+	return lastQ, true
+}
+
 func broadCastResult(_ context.Context, code string, q QuizEnginer) error {
 	players, _ := GetAllPlayers(code)
 

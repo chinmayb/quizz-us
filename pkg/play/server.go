@@ -99,18 +99,52 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 		if in.GetAction() == pb.GamePlayAction_JOIN {
 			// shouldnt send the same
 			log.Info("Player joined", "player", in.GetId(), "name", in.GetName())
-			// TODO only host can initialize the game
-			initGame(stream.Context(), in.GetCode())
-			playObj.Player.Id = in.GetId()
-			playObj.Player.Name = in.GetName()
 
-			_, playerCancel := context.WithCancel(stream.Context())
-			playObj.SetCancelFunc(playerCancel)
+			_, playerExists := quiz.GetPlayer(code, in.GetId())
+			isRejoin := playerExists == nil
 
-			quiz.AddPlayerToRegistry(code, playObj)
-			// waiting for the question/result & send it to player
-			// should happen only once when the player joins
+			if !isRejoin {
+				// TODO only host can initialize the game
+				initGame(stream.Context(), in.GetCode())
+				playObj.Player.Id = in.GetId()
+				playObj.Player.Name = in.GetName()
+
+				_, playerCancel := context.WithCancel(stream.Context())
+				playObj.SetCancelFunc(playerCancel)
+
+				quiz.AddPlayerToRegistry(code, playObj)
+			}
+
 			go func() {
+				if isRejoin {
+					newQ := make(chan *data.QuizData)
+					newResult := make(chan *pb.GameSummary)
+					_, newCancel := context.WithCancel(stream.Context())
+					lastQ, ok := quiz.RejoinPlayer(code, in.GetId(), newQ, newResult, newCancel)
+					if !ok {
+						log.Warn("rejoin failed", "player", in.GetId())
+						return
+					}
+					playObj.QuestionForPlayer = newQ
+					playObj.Result = newResult
+
+					if lastQ != nil {
+						out := &pb.GamePlay{
+							Id:   in.GetId(),
+							Code: code,
+							Cmd: &pb.GamePlay_Command{Command: &pb.GamePlayCommand{
+								Id:           lastQ.Id,
+								Question:     lastQ.Question,
+								QuestionTime: timestamppb.Now(),
+							}},
+						}
+						if err := stream.Send(out); err != nil {
+							log.Error("error sending catch-up question", "err", err)
+							return
+						}
+					}
+				}
+
 				for {
 					select {
 					case quizQuestion := <-playObj.QuestionForPlayer:

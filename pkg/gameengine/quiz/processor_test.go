@@ -314,3 +314,174 @@ func TestGetLastQuestion_NoGame(t *testing.T) {
 		t.Fatalf("expected nil for nonexistent game, got %v", got)
 	}
 }
+
+func TestRejoinPlayer_DisconnectedPlayer(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	code := "REJOIN-DC"
+	playerID := "player-dc"
+	lastQ := &data.QuizData{Id: "q1", Question: "What?", Answer: "That"}
+
+	oldQ := make(chan *data.QuizData, 1)
+	oldResult := make(chan *pb.GameSummary, 1)
+
+	player := &PlayerObj{
+		Player:            &pb.Player{Id: playerID, Score: 5, Status: pb.PlayerStatus_DISCONNECTED},
+		QuestionForPlayer: oldQ,
+		Result:            oldResult,
+	}
+
+	game := &Game{players: PlayersMap{playerID: player}}
+	game.lastQMu.Lock()
+	game.lastQuestion = lastQ
+	game.lastQMu.Unlock()
+
+	GameRegistry.mu.Lock()
+	GameRegistry.games[code] = game
+	GameRegistry.mu.Unlock()
+
+	newQ := make(chan *data.QuizData, 1)
+	newResult := make(chan *pb.GameSummary, 1)
+	_, newCancel := context.WithCancel(context.Background())
+
+	gotQ, ok := RejoinPlayer(code, playerID, newQ, newResult, newCancel)
+	if !ok {
+		t.Fatal("expected RejoinPlayer to return true")
+	}
+
+	if player.Player.Status != pb.PlayerStatus_PLAYING {
+		t.Fatalf("expected PLAYING, got %d", player.Player.Status)
+	}
+	if player.Player.Score != 5 {
+		t.Fatalf("expected score 5, got %d", player.Player.Score)
+	}
+	if player.QuestionForPlayer != newQ {
+		t.Fatal("QuestionForPlayer channel was not replaced")
+	}
+	if player.Result != newResult {
+		t.Fatal("Result channel was not replaced")
+	}
+	if gotQ == nil {
+		t.Fatal("expected lastQ to be returned, got nil")
+	}
+	if gotQ.Id != lastQ.Id {
+		t.Fatalf("expected lastQ Id %s, got %s", lastQ.Id, gotQ.Id)
+	}
+}
+
+func TestRejoinPlayer_PlayingPlayer_KicksOld(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	code := "REJOIN-KICK"
+	playerID := "player-kick"
+
+	oldCtx, oldCancel := context.WithCancel(context.Background())
+
+	player := &PlayerObj{
+		Player:            &pb.Player{Id: playerID, Status: pb.PlayerStatus_PLAYING},
+		QuestionForPlayer: make(chan *data.QuizData, 1),
+		Result:            make(chan *pb.GameSummary, 1),
+		cancelCtx:         oldCancel,
+	}
+
+	GameRegistry.mu.Lock()
+	GameRegistry.games[code] = &Game{players: PlayersMap{playerID: player}}
+	GameRegistry.mu.Unlock()
+
+	newQ := make(chan *data.QuizData, 1)
+	newResult := make(chan *pb.GameSummary, 1)
+	_, newCancel := context.WithCancel(context.Background())
+
+	_, ok := RejoinPlayer(code, playerID, newQ, newResult, newCancel)
+	if !ok {
+		t.Fatal("expected RejoinPlayer to return true")
+	}
+
+	// Old cancel should have been called
+	select {
+	case <-oldCtx.Done():
+	case <-time.After(time.Second):
+		t.Fatal("expected old context to be cancelled")
+	}
+
+	if player.QuestionForPlayer != newQ {
+		t.Fatal("QuestionForPlayer channel was not replaced")
+	}
+	if player.Result != newResult {
+		t.Fatal("Result channel was not replaced")
+	}
+}
+
+func TestRejoinPlayer_NotFound(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	newQ := make(chan *data.QuizData, 1)
+	newResult := make(chan *pb.GameSummary, 1)
+	_, newCancel := context.WithCancel(context.Background())
+
+	gotQ, ok := RejoinPlayer("none", "p1", newQ, newResult, newCancel)
+	if ok {
+		t.Fatal("expected RejoinPlayer to return false for missing game")
+	}
+	if gotQ != nil {
+		t.Fatal("expected nil lastQ for missing game")
+	}
+
+	GameRegistry.mu.Lock()
+	GameRegistry.games["exists"] = &Game{players: PlayersMap{}}
+	GameRegistry.mu.Unlock()
+
+	gotQ, ok = RejoinPlayer("exists", "nonexistent-player", newQ, newResult, newCancel)
+	if ok {
+		t.Fatal("expected RejoinPlayer to return false for missing player")
+	}
+	if gotQ != nil {
+		t.Fatal("expected nil lastQ for missing player")
+	}
+}
+
+func TestRejoinPlayer_ScorePreserved(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	code := "REJOIN-SCORE"
+	playerID := "player-score"
+
+	player := &PlayerObj{
+		Player:            &pb.Player{Id: playerID, Score: 7, Status: pb.PlayerStatus_DISCONNECTED},
+		QuestionForPlayer: make(chan *data.QuizData, 1),
+		Result:            make(chan *pb.GameSummary, 1),
+	}
+
+	GameRegistry.mu.Lock()
+	GameRegistry.games[code] = &Game{players: PlayersMap{playerID: player}}
+	GameRegistry.mu.Unlock()
+
+	newQ := make(chan *data.QuizData, 1)
+	newResult := make(chan *pb.GameSummary, 1)
+	_, newCancel := context.WithCancel(context.Background())
+
+	_, ok := RejoinPlayer(code, playerID, newQ, newResult, newCancel)
+	if !ok {
+		t.Fatal("expected RejoinPlayer to return true")
+	}
+
+	if player.Player.Score != 7 {
+		t.Fatalf("expected score 7, got %d", player.Player.Score)
+	}
+}
