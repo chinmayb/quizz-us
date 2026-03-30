@@ -62,6 +62,7 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 	qForPlayChan := make(chan *data.QuizData)
 	playObj := &quiz.PlayerObj{
 		QuestionForPlayer: qForPlayChan,
+		Result:            make(chan *pb.GameSummary),
 		Player:            &pb.Player{},
 	}
 	ticker := time.NewTicker(30 * time.Second)
