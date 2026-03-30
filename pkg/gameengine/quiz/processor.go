@@ -75,6 +75,11 @@ func RemoveGame(gameID string) {
 	GameRegistry.mu.Lock()
 	defer GameRegistry.mu.Unlock()
 
+	if game, ok := GameRegistry.games[gameID]; ok {
+		if game.cancelFn != nil {
+			game.cancelFn()
+		}
+	}
 	delete(GameRegistry.games, gameID)
 }
 
@@ -133,16 +138,22 @@ func NewGameProcessor(gameChan chan GamePro, ansChan chan PlayerObj) *Game {
 		areAllAnsweredRight: areAllAnsweredRight,
 	}
 	return &Game{
-		gp,
-		players,
-		"",
+		GamePro:  gp,
+		players:  players,
+		Code:     "",
+		cancelFn: nil,
 	}
 }
 
 type Game struct {
-	GamePro gameProcessor
-	players PlayersMap
-	Code    string
+	GamePro  gameProcessor
+	players  PlayersMap
+	Code     string
+	cancelFn context.CancelFunc
+}
+
+func (g *Game) SetCancelFn(fn context.CancelFunc) {
+	g.cancelFn = fn
 }
 
 type gameProcessor struct {

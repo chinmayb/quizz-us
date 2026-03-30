@@ -23,7 +23,7 @@ type PlayServer struct {
 	pb.UnimplementedGamesServer
 }
 
-func initGame(ctx context.Context, code string) {
+func initGame(_ context.Context, code string) {
 	gameChan := make(chan quiz.GamePro)
 	ansChan := make(chan quiz.PlayerObj)
 	p := quiz.NewGameProcessor(gameChan, ansChan)
@@ -35,9 +35,12 @@ func initGame(ctx context.Context, code string) {
 		return
 	}
 
+	gameCtx, cancel := context.WithCancel(context.Background())
+	p.SetCancelFn(cancel)
+
 	// should start only once
 	go func() {
-		if err := p.Process(ctx); err != nil {
+		if err := p.Process(gameCtx); err != nil {
 			log.Error("game processor stopped", "err", err, "gameID", code)
 		}
 	}()
