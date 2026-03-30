@@ -1,0 +1,2 @@
+ - Score updates must be written back to the registry entry, not only mutated on the transient `PlayerObj` passed through `AnswerChan`.
+ - `updatePlayerScore` can safely reuse the existing registry lock and keep the fix in-memory only.

@@ -1,0 +1,2 @@
+- Kept Result unbuffered to match the existing QuestionForPlayer pattern and avoid changing broadcast semantics.
+- Added only a missing-game early return in RemovePlayerFromRegistry; no broader registry changes were needed for this fix.

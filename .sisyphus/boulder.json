@@ -1,0 +1,46 @@
+{
+  "active_plan": "/Users/cbharadwaj/work/codespace/quizz-us/.sisyphus/plans/player-rejoin.md",
+  "started_at": "2026-03-30T10:50:38.429Z",
+  "session_ids": [
+    "ses_2c1f51f38ffeHJW54x8MoN3pK2",
+    "ses_2c1a0ddebffeyo2LfzTEdQfvx3",
+    "ses_2c1a1317bffeQW4KZO9ZYYpWSV",
+    "ses_2c19c4924ffeeWNkXCOoFbcI3M",
+    "ses_2c19c8cf5ffeg1Aqv65M2XlHCJ",
+    "ses_2c1925b26ffekagOCtTA5tZRu3",
+    "ses_2c18c3ec7ffe3Fq8sqsf4164az",
+    "ses_2c18c0a80ffed3symZCcclBjS8",
+    "ses_2c189e4a6ffe3JNWOQlodi8V83"
+  ],
+  "plan_name": "player-rejoin",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Fix Result channel allocation and nil-guard RemovePlayerFromRegistry",
+      "session_id": "ses_2c1a1317bffeQW4KZO9ZYYpWSV",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-03-30T10:54:26.025Z"
+    },
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "JOIN handler rejoin detection + RejoinPlayer() registry helper",
+      "session_id": "ses_2c1925b26ffekagOCtTA5tZRu3",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-03-30T11:13:30.437Z"
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "**Full suite + build verification** — `unspecified-high`",
+      "session_id": "ses_2c189e4a6ffe3JNWOQlodi8V83",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-03-30T11:18:25.768Z"
+    }
+  }
+}

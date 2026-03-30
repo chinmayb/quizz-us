@@ -1,0 +1,5 @@
+Test command: go test ./pkg/gameengine/quiz/ -v -run TestScoreTrackedInRegistry
+Result: PASS
+
+Build command: go build ./...
+Result: PASS

@@ -12,3 +12,10 @@
 - broadCastQuestion stores the question after receiving from the channel and before fanning out, using game.lastQMu.Lock()/Unlock() directly (no defer, short critical section).
 - Working tree may contain uncommitted test changes from a parallel task (Task 3 tests were present before Task 4 started); always check git status before assuming the file matches HEAD.
 - When working-tree test file references symbols not yet in processor.go, the build fails; implementing the missing symbols (Task 3 impl was already present in working tree) resolves it.
+
+- RejoinPlayer must release GameRegistry.mu.Lock() BEFORE calling GetLastQuestion(), which internally acquires GameRegistry.mu.RLock() via GetGame() — avoids RLock-inside-Lock deadlock.
+- The old cancelCtx is called INSIDE the lock in RejoinPlayer (context.CancelFunc is non-blocking) — safe and prevents a race where old goroutine could read stale channels.
+- GetPlayer returns (*PlayerObj, error) not (*PlayerObj, bool) — rejoin detection uses `err == nil` to detect existing player.
+- Fresh channels (newQ, newResult) are created INSIDE the goroutine in server.go, before calling RejoinPlayer — ensures the goroutine's select loop reads from the same channels that get swapped into the registry.
+- playObj.QuestionForPlayer and playObj.Result are updated AFTER RejoinPlayer returns so the local select loop uses the new channels.
+- isRejoin logic: `playerExists == nil` (no error) means player was found — covers both DISCONNECTED and PLAYING states for kick-and-rejoin.

@@ -1,0 +1,2 @@
+ - Kept the fix localized to `processor.go` and `processor_test.go`.
+ - Added a direct registry update helper instead of changing channel payloads or server-side flow.

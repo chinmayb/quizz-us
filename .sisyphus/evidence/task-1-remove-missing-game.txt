@@ -1,0 +1,1 @@
+go test ./pkg/gameengine/quiz/ -v -run TestRemovePlayerFromRegistry_MissingGame passed
