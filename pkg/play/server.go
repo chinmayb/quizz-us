@@ -115,8 +115,7 @@ func (p *PlayServer) Play(stream pb.Games_PlayServer) error {
 								Id:           quizQuestion.Id,
 								Question:     quizQuestion.Question,
 								QuestionTime: timestamppb.Now(),
-								// TODO: do not expose correct answer until results phase
-								CorrectAnswer: quizQuestion.Answer,
+								// CorrectAnswer intentionally omitted — only exposed in results/summary phase
 							}},
 						}
 						if err := stream.Send(out); err != nil {
