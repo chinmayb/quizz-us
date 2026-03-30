@@ -94,6 +94,29 @@ func RemovePlayerFromRegistry(gameID string, playerID string) {
 	delete(game.players, playerID)
 }
 
+func DisconnectPlayer(gameID string, playerID string) {
+	var cancelFn context.CancelFunc
+
+	GameRegistry.mu.Lock()
+	game, ok := GameRegistry.games[gameID]
+	if !ok {
+		GameRegistry.mu.Unlock()
+		return
+	}
+	p, ok := game.players[playerID]
+	if !ok {
+		GameRegistry.mu.Unlock()
+		return
+	}
+	p.Player.Status = pb.PlayerStatus_DISCONNECTED
+	cancelFn = p.cancelCtx
+	GameRegistry.mu.Unlock()
+
+	if cancelFn != nil {
+		cancelFn()
+	}
+}
+
 func updatePlayerScore(gameID string, playerID string, score int32) {
 	GameRegistry.mu.Lock()
 	defer GameRegistry.mu.Unlock()
@@ -143,6 +166,11 @@ type PlayerObj struct {
 	QuestionForPlayer chan *data.QuizData
 	Result            chan *pb.GameSummary
 	AnswerFromPlayer  *data.QuizData
+	cancelCtx         context.CancelFunc
+}
+
+func (p *PlayerObj) SetCancelFunc(fn context.CancelFunc) {
+	p.cancelCtx = fn
 }
 
 func NewGameProcessor(gameChan chan GamePro, ansChan chan PlayerObj) *Game {
@@ -163,10 +191,12 @@ func NewGameProcessor(gameChan chan GamePro, ansChan chan PlayerObj) *Game {
 }
 
 type Game struct {
-	GamePro  gameProcessor
-	players  PlayersMap
-	Code     string
-	cancelFn context.CancelFunc
+	GamePro      gameProcessor
+	players      PlayersMap
+	Code         string
+	cancelFn     context.CancelFunc
+	lastQuestion *data.QuizData
+	lastQMu      sync.RWMutex
 }
 
 func (g *Game) SetCancelFn(fn context.CancelFunc) {
@@ -257,16 +287,33 @@ func broadCastQuestion(ctx context.Context, code string, q QuizEnginer) error {
 	if err != nil {
 		return fmt.Errorf("error in play %v", err)
 	}
-	data := <-quizdata
+	d := <-quizdata
+	if game, ok := GetGame(code); ok {
+		game.lastQMu.Lock()
+		game.lastQuestion = d
+		game.lastQMu.Unlock()
+	}
 	for _, player := range players {
-		// fan out the quiz questions to players
 		p := player
+		if p.Player.Status == pb.PlayerStatus_DISCONNECTED {
+			continue
+		}
 		go func(pl *PlayerObj) {
 			log.Debug("sending question to", "player", pl.Player.Id)
-			pl.QuestionForPlayer <- data
+			pl.QuestionForPlayer <- d
 		}(p)
 	}
 	return nil
+}
+
+func GetLastQuestion(gameID string) *data.QuizData {
+	game, ok := GetGame(gameID)
+	if !ok {
+		return nil
+	}
+	game.lastQMu.RLock()
+	defer game.lastQMu.RUnlock()
+	return game.lastQuestion
 }
 
 func broadCastResult(_ context.Context, code string, q QuizEnginer) error {
@@ -274,8 +321,10 @@ func broadCastResult(_ context.Context, code string, q QuizEnginer) error {
 
 	// TODO add result from DB
 	for _, player := range players {
-		// fan out the quiz questions to players
 		p := player
+		if p.Player.Status == pb.PlayerStatus_DISCONNECTED {
+			continue
+		}
 		go func(pl *PlayerObj) {
 			pl.Result <- nil
 		}(p)
