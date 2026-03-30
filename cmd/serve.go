@@ -17,6 +17,7 @@ import (
 	pb "github.com/chinmayb/quizz-us/gen/go/api"
 	"github.com/chinmayb/quizz-us/pkg/data"
 	"github.com/chinmayb/quizz-us/pkg/play"
+	ws "github.com/chinmayb/quizz-us/pkg/transport/ws"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -100,7 +101,7 @@ func spawnServer() {
 	}
 	defer grpcConn.Close()
 	client := pb.NewGamesClient(grpcConn)
-	httpMux := WSHandler(ctx, *logger, client)
+	httpMux := ws.WSHandler(ctx, *logger, client)
 
 	httpMux.Handle("/play", gwmux)
 	logger.Info("Serving gRPC-Gateway & WS on http://0.0.0.0:8080")

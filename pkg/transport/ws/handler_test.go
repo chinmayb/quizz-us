@@ -1,4 +1,4 @@
-package cmd
+package ws
 
 import (
 	"encoding/json"
