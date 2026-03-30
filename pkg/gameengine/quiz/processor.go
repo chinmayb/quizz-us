@@ -87,7 +87,24 @@ func RemovePlayerFromRegistry(gameID string, playerID string) {
 	GameRegistry.mu.Lock()
 	defer GameRegistry.mu.Unlock()
 
-	delete(GameRegistry.games[gameID].players, playerID)
+	game, ok := GameRegistry.games[gameID]
+	if !ok {
+		return
+	}
+	delete(game.players, playerID)
+}
+
+func updatePlayerScore(gameID string, playerID string, score int32) {
+	GameRegistry.mu.Lock()
+	defer GameRegistry.mu.Unlock()
+
+	game, ok := GameRegistry.games[gameID]
+	if !ok {
+		return
+	}
+	if p, ok := game.players[playerID]; ok {
+		p.Player.Score = score
+	}
 }
 
 func AddPlayerToRegistry(gameID string, playerObj *PlayerObj) {
@@ -213,6 +230,7 @@ func (g *Game) Play(ctx context.Context, code string) error {
 			// TODO update the score in the DB
 			// add a logic to give more points for faster answers
 			playerobj.Player.Score++
+			updatePlayerScore(g.Code, playerobj.Player.Id, playerobj.Player.Score)
 			// TODO notify all the players that they one player has answered the question
 			// TODO check if all answered right if so send it to that channel
 

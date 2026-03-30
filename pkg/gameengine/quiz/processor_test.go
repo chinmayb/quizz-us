@@ -76,3 +76,58 @@ func TestBroadCastQuestionFansOutToAllPlayers(t *testing.T) {
 		}
 	}
 }
+
+func TestResultChannelAllocated(t *testing.T) {
+	result := make(chan *pb.GameSummary)
+	playObj := &PlayerObj{
+		QuestionForPlayer: make(chan *data.QuizData),
+		Result:            result,
+		Player:            &pb.Player{},
+	}
+	if playObj.Result == nil {
+		t.Fatal("expected Result channel to be allocated, got nil")
+	}
+}
+
+func TestRemovePlayerFromRegistry_MissingGame(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	RemovePlayerFromRegistry("nonexistent-game", "player-1")
+}
+
+func TestScoreTrackedInRegistry(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	code := "SCORE01"
+	playerID := "player-score"
+
+	player := &PlayerObj{
+		Player:            &pb.Player{Id: playerID, Score: 0},
+		QuestionForPlayer: make(chan *data.QuizData, 1),
+		Result:            make(chan *pb.GameSummary, 1),
+	}
+
+	GameRegistry.mu.Lock()
+	GameRegistry.games[code] = &Game{
+		players: PlayersMap{playerID: player},
+	}
+	GameRegistry.mu.Unlock()
+
+	updatePlayerScore(code, playerID, 3)
+
+	got, err := GetPlayer(code, playerID)
+	if err != nil {
+		t.Fatalf("GetPlayer: %v", err)
+	}
+	if got.Player.Score != 3 {
+		t.Fatalf("expected score 3, got %d", got.Player.Score)
+	}
+}
