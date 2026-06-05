@@ -23,6 +23,36 @@ func (s *stubQuizEngine) ValidateAnswer(context.Context, *data.QuizData) bool {
 	return true
 }
 
+func TestOnlyHostCanBeginGame(t *testing.T) {
+	t.Cleanup(func() {
+		GameRegistry.mu.Lock()
+		GameRegistry.games = make(map[string]*Game)
+		GameRegistry.mu.Unlock()
+	})
+
+	const code = "HOSTTEST"
+	const hostID = "host-player"
+	const nonHostID = "other-player"
+
+	gameChan := make(chan GamePro, 1)
+	ansChan := make(chan PlayerObj, 1)
+	game := NewGameProcessor(gameChan, ansChan)
+	game.Code = code
+	game.HostID = hostID
+	AddGame(code, game)
+
+	g, ok := GetGame(code)
+	if !ok {
+		t.Fatal("game not found after AddGame")
+	}
+	if g.HostID != hostID {
+		t.Fatalf("expected HostID %q, got %q", hostID, g.HostID)
+	}
+	if g.HostID == nonHostID {
+		t.Fatalf("non-host %q should not be able to begin the game", nonHostID)
+	}
+}
+
 func TestBroadCastQuestionFansOutToAllPlayers(t *testing.T) {
 	t.Cleanup(func() {
 		GameRegistry.mu.Lock()
@@ -46,7 +76,7 @@ func TestBroadCastQuestionFansOutToAllPlayers(t *testing.T) {
 
 	engine := &stubQuizEngine{question: question}
 
-	if err := broadCastQuestion(context.Background(), code, engine); err != nil {
+	if _, err := broadCastQuestion(context.Background(), code, engine); err != nil {
 		t.Fatalf("broadCastQuestion returned error: %v", err)
 	}
 

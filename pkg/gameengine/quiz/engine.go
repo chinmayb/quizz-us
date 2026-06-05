@@ -31,7 +31,7 @@ func NewQuizEnginer() QuizEnginer {
 func (q *quizengine) ProduceQuestions(ctx context.Context, req any) (chan *data.QuizData, chan error) {
 	questn := make(chan *data.QuizData)
 	go func() {
-		num := rand.Int31n(int32(len(data.QuizDataRefined)))
+		num := rand.Int31n(int32(len(data.QuizDataRefined))) + 1
 		quizD := data.QuizDataRefined[strconv.Itoa(int(num))]
 		questn <- &quizD
 	}()

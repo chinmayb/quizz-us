@@ -52,6 +52,18 @@
                     <p>Game Code: <strong>{{ gameCode }}</strong></p>
                     <p class="player-name-display">You: <strong>{{ playerName }}</strong></p>
                     
+                    <!-- Player list -->
+                    <div v-if="players.length > 0" class="players-list">
+                        <h4>Players in Lobby ({{ players.length }}):</h4>
+                        <ul>
+                            <li v-for="player in players" :key="player.id" class="player-item">
+                                <span class="player-avatar">👤</span>
+                                <span class="player-name">{{ player.name }}</span>
+                                <span v-if="player.id === playerId" class="you-badge">(You)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
                     <!-- Host-only start button -->
                     <button 
                         v-if="isHost" 
@@ -128,6 +140,7 @@
                     playerId: null,
                     isHost: false, // Track if current user is the host
                     gameState: 'waiting', // 'waiting', 'playing', 'finished'
+                    players: [], // List of all players in the game
                     
                     // Current question data
                     currentQuestion: null,
@@ -310,7 +323,17 @@
                 
                 handleGameSummary(summary) {
                     console.log('Game summary received:', summary);
-                    // Handle game over, player list updates, etc.
+                    
+                    // Update player list if provided
+                    if (summary.players) {
+                        this.players = summary.players;
+                        console.log('Updated player list:', this.players);
+                    }
+                    
+                    // Handle game over status
+                    if (summary.status === 'GAME_OVER') {
+                        this.gameState = 'finished';
+                    }
                 },
                 
                 handleGameCommand(command) {
