@@ -80,8 +80,53 @@ enum GamePlayAction {
   END = 4;
 }
 
+message CreateGameRequest {
+  // game kind identifier (e.g. quiz, puzzle, trivia)
+  string game_kind_id = 7;
+
+  // host player identifier
+  string host_id = 1;
+
+  // host display name
+  string host_name = 2;
+
+  // selected categories/tags for this game
+  repeated string categories = 3;
+
+  // per-question duration override
+  google.protobuf.Duration question_duration = 4;
+
+  // target score to finish the game
+  int32 target_score = 5;
+
+  // optional max total game duration
+  google.protobuf.Duration target_time = 6;
+}
+
+message CreateGameResponse {
+  // generated game code
+  string code = 1;
+
+  // game metadata snapshot
+  Game game = 2;
+
+  // host player metadata
+  Player host = 3;
+
+  // initial lobby summary
+  GameSummary summary = 4;
+}
+
 // Interface exported by the game server.
 service Games {
+  // Create a game lobby and return a generated code.
+  rpc CreateGame(CreateGameRequest) returns (CreateGameResponse) {
+    option (google.api.http) = {
+      post: "/games"
+      body: "*"
+    };
+  }
+
   // A Bidirectional streaming gameplay.
   //
   // Accepts a stream of GamePlay while a game is being played,
@@ -108,6 +153,9 @@ message GamePlayCommand {
 
   // timestamp question was asked
   google.protobuf.Timestamp question_time = 5;
+
+  // optional image URL associated with the question
+  string image_src = 6;
 }
 
 message GamePlay {

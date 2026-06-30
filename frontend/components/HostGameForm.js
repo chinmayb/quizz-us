@@ -11,19 +11,21 @@ const HostGameForm = {
     data() {
         return {
             playerName: '',
-            gameCode: '',
+            gameKindId: 'quiz',
+            categoriesInput: '',
+            questionDurationSeconds: 30,
+            targetScore: 10,
             errors: {
                 playerName: '',
-                gameCode: ''
+                questionDurationSeconds: '',
+                targetScore: ''
             }
         };
     },
 
     computed: {
         canHost() {
-            return this.playerName.trim().length >= 2 &&
-                   /^[A-Z0-9]{6}$/.test(this.gameCode) &&
-                   !this.isHosting;
+            return this.playerName.trim().length >= 2 && !this.isHosting;
         }
     },
 
@@ -59,28 +61,62 @@ const HostGameForm = {
                     </div>
 
                     <div class="form-group">
-                        <div class="form-label-row">
-                            <label for="host-game-code" class="form-label">Game Code</label>
-                            <button type="button" class="btn btn-tertiary" @click="generateCode" :disabled="isHosting">
-                                Generate
-                            </button>
-                        </div>
+                        <label for="host-game-kind" class="form-label">Game Type</label>
+                        <select
+                            id="host-game-kind"
+                            v-model="gameKindId"
+                            class="form-input"
+                            :disabled="isHosting"
+                        >
+                            <option value="quiz">Quiz</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="host-categories" class="form-label">Categories (optional)</label>
                         <input
                             type="text"
-                            id="host-game-code"
-                            v-model="gameCode"
-                            @input="formatGameCode"
-                            placeholder="Create a game code (e.g., ABC123)"
-                            class="form-input game-code-input"
-                            :class="{ error: errors.gameCode }"
-                            maxlength="6"
+                            id="host-categories"
+                            v-model="categoriesInput"
+                            placeholder="history, science, sports"
+                            class="form-input"
+                            :disabled="isHosting"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="host-duration" class="form-label">Question Duration (seconds)</label>
+                        <input
+                            type="number"
+                            id="host-duration"
+                            v-model.number="questionDurationSeconds"
+                            min="5"
+                            max="120"
+                            class="form-input"
+                            :class="{ error: errors.questionDurationSeconds }"
+                            :disabled="isHosting"
                             required
                         >
-                        <div v-if="errors.gameCode" class="error-message">
-                            {{ errors.gameCode }}
+                        <div v-if="errors.questionDurationSeconds" class="error-message">
+                            {{ errors.questionDurationSeconds }}
                         </div>
-                        <div class="form-hint">
-                            Share this 6-character code with players to join your game
+                    </div>
+
+                    <div class="form-group">
+                        <label for="host-target-score" class="form-label">Target Score</label>
+                        <input
+                            type="number"
+                            id="host-target-score"
+                            v-model.number="targetScore"
+                            min="1"
+                            max="100"
+                            class="form-input"
+                            :class="{ error: errors.targetScore }"
+                            :disabled="isHosting"
+                            required
+                        >
+                        <div v-if="errors.targetScore" class="error-message">
+                            {{ errors.targetScore }}
                         </div>
                     </div>
 
@@ -110,28 +146,17 @@ const HostGameForm = {
     `,
 
     methods: {
-        formatGameCode() {
-            this.gameCode = this.gameCode.replace(/\s/g, '').toUpperCase();
-            this.clearError('gameCode');
-        },
-
-        generateCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            this.gameCode = code;
-            this.clearError('gameCode');
-        },
-
         clearError(field) {
             this.errors[field] = '';
         },
 
         validateForm() {
             let isValid = true;
-            this.errors = { playerName: '', gameCode: '' };
+            this.errors = {
+                playerName: '',
+                questionDurationSeconds: '',
+                targetScore: ''
+            };
 
             if (!this.playerName.trim()) {
                 this.errors.playerName = 'Player name is required';
@@ -141,14 +166,13 @@ const HostGameForm = {
                 isValid = false;
             }
 
-            if (!this.gameCode.trim()) {
-                this.errors.gameCode = 'Game code is required';
+            if (!Number.isFinite(this.questionDurationSeconds) || this.questionDurationSeconds < 5 || this.questionDurationSeconds > 120) {
+                this.errors.questionDurationSeconds = 'Question duration must be between 5 and 120 seconds';
                 isValid = false;
-            } else if (this.gameCode.length !== 6) {
-                this.errors.gameCode = 'Game code must be exactly 6 characters';
-                isValid = false;
-            } else if (!/^[A-Z0-9]{6}$/.test(this.gameCode)) {
-                this.errors.gameCode = 'Game code must contain only letters and numbers';
+            }
+
+            if (!Number.isFinite(this.targetScore) || this.targetScore < 1 || this.targetScore > 100) {
+                this.errors.targetScore = 'Target score must be between 1 and 100';
                 isValid = false;
             }
 
@@ -162,7 +186,13 @@ const HostGameForm = {
 
             this.$emit('start-host', {
                 playerName: this.playerName.trim(),
-                gameCode: this.gameCode.trim()
+                gameKindId: this.gameKindId,
+                categories: this.categoriesInput
+                    .split(',')
+                    .map((value) => value.trim())
+                    .filter((value) => value.length > 0),
+                questionDurationSeconds: this.questionDurationSeconds,
+                targetScore: this.targetScore
             });
         }
     },

@@ -104,6 +104,7 @@ func spawnServer() {
 	httpMux := ws.WSHandler(ctx, *logger, client)
 
 	httpMux.Handle("/play", gwmux)
+	httpMux.Handle("/games", gwmux)
 	logger.Info("Serving gRPC-Gateway & WS on http://0.0.0.0:8080")
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), httpMux); err != nil {
 		logger.Error("failed to serve http", "error", err)

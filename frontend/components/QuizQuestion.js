@@ -32,100 +32,125 @@ window.QuizQuestion = {
   },
   
   emits: ['update:userAnswer', 'submit-answer', 'next-question'],
-  
+
+  data() {
+    return {
+      imageFailed: false
+    };
+  },
+
+  watch: {
+    'question.id'() {
+      // Reset image error state whenever a new question arrives
+      this.imageFailed = false;
+    }
+  },
+
   template: `
-    <div class="quiz-question-card">
-      <!-- Question Header -->
-      <div class="question-header">
-        <div class="question-number-section">
-          <h2 class="question-number">Question #{{ questionNumber }}</h2>
-          <p v-if="totalQuestions" class="question-progress">of {{ totalQuestions }} questions</p>
+    <div class="quiz-card">
+      <!-- Header -->
+      <div class="quiz-card__header">
+        <span class="quiz-card__badge">Q{{ questionNumber }}</span>
+        <span v-if="totalQuestions" class="quiz-card__progress">
+          Question {{ questionNumber }} of {{ totalQuestions }}
+        </span>
+      </div>
+
+      <!-- Media / Image area -->
+      <div class="quiz-card__media">
+        <img
+          v-if="imageUrl && !imageFailed"
+          :src="imageUrl"
+          :alt="'Question ' + questionNumber + ' image'"
+          class="quiz-card__image"
+          @error="imageFailed = true"
+        />
+        <div v-else class="quiz-card__image-placeholder" aria-hidden="true">
+          <span class="quiz-card__image-icon">🖼️</span>
+          <span class="quiz-card__image-hint">{{ imageUrl ? 'Image unavailable' : 'No image for this question' }}</span>
         </div>
       </div>
-      
-      <div class="question-divider"></div>
-      
-      <!-- Question Content -->
-      <div class="question-body">
-        <div class="question-text-container">
-          <p class="question-text">{{ question.question || question.text }}</p>
-        </div>
-        
-        <!-- Optional Question Image -->
-        <div v-if="question.image" class="question-image-container">
-          <img :src="question.image" :alt="'Question ' + questionNumber" class="question-image" />
-        </div>
-      </div>
-      
-      <!-- Answer Section -->
-      <div class="answer-section">
-        <label for="answer-input" class="answer-label">Your Answer</label>
-        <div class="answer-input-group">
-          <input 
-            type="text" 
+
+      <!-- Question text -->
+      <h2 class="quiz-card__question">{{ questionText }}</h2>
+
+      <!-- Answer area -->
+      <div class="quiz-card__answer">
+        <label for="answer-input" class="quiz-card__label">Your answer</label>
+        <div class="quiz-card__input-row">
+          <input
+            type="text"
             id="answer-input"
             :value="userAnswer"
             @input="$emit('update:userAnswer', $event.target.value)"
             @keyup.enter="handleSubmit"
-            placeholder="Type your answer here..."
-            class="answer-input-field"
+            placeholder="Type your answer…"
+            class="quiz-card__input"
             :disabled="isSubmitted"
-            :class="{ 'disabled': isSubmitted }"
-          >
-          <button 
-            @click="handleSubmit" 
-            class="submit-btn" 
+            autocomplete="off"
+          />
+          <button
+            @click="handleSubmit"
+            class="quiz-card__submit"
             :disabled="!canSubmit"
-            :class="{ 'disabled': !canSubmit }"
           >
             {{ submitButtonText }}
           </button>
         </div>
-        
-        <!-- Result Display -->
+
+        <!-- Result feedback -->
         <transition name="result-fade">
-          <div v-if="showResult" :class="['result-feedback', resultClass]">
-            <span class="result-icon">{{ resultIcon }}</span>
-            <span class="result-text">{{ resultMessage }}</span>
+          <div v-if="showResult" :class="['quiz-card__result', resultClass]">
+            <span class="quiz-card__result-icon">{{ resultIcon }}</span>
+            <span class="quiz-card__result-text">{{ resultMessage }}</span>
           </div>
         </transition>
-        
-        <!-- Next Question Button -->
+
+        <!-- Next question -->
         <transition name="button-fade">
-          <div v-if="showResult" class="next-question-container">
-            <button @click="$emit('next-question')" class="next-question-btn">
-              Next Question →
-            </button>
-          </div>
+          <button
+            v-if="showResult"
+            @click="$emit('next-question')"
+            class="quiz-card__next"
+          >
+            Next Question →
+          </button>
         </transition>
       </div>
     </div>
   `,
-  
+
   computed: {
+    questionText() {
+      return this.question.question || this.question.text || '';
+    },
+
+    imageUrl() {
+      return this.question.image || this.question.imageSrc || this.question.image_src || '';
+    },
+
     canSubmit() {
       return this.userAnswer.trim().length > 0 && !this.isSubmitted;
     },
-    
+
     submitButtonText() {
-      if (this.isSubmitted) return '✓ Submitted';
-      return 'Submit';
+      return this.isSubmitted ? '✓ Submitted' : 'Submit';
     },
-    
+
     resultMessage() {
       if (!this.showResult) return '';
       if (this.isCorrect) return 'Correct! Well done!';
       const correctAnswer = this.question.correctAnswer || this.question.answer;
       return correctAnswer ? `The correct answer is: ${correctAnswer}` : 'Incorrect';
     },
-    
+
     resultIcon() {
       return this.isCorrect ? '🎉' : '❌';
     },
-    
+
     resultClass() {
       if (!this.showResult) return '';
-      return this.isCorrect ? 'correct' : 'incorrect';
+      return this.isCorrect ? 'is-correct' : 'is-incorrect';
     }
   },
   

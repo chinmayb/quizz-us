@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
     --bg:      #0C0C0C;
@@ -19,7 +19,7 @@
 }
 
 body {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -65,7 +65,7 @@ body {
 }
 
 .subtitle {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.65rem;
     font-weight: 300;
     color: var(--muted);
@@ -88,7 +88,7 @@ body {
 }
 
 .btn {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.7rem;
     font-weight: 500;
     letter-spacing: 0.18em;
@@ -195,7 +195,7 @@ body {
 }
 
 .form-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.65rem;
     font-weight: 500;
     letter-spacing: 0.2em;
@@ -252,7 +252,7 @@ body {
     border: none;
     border-bottom: 1px solid var(--border);
     color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.875rem;
     font-weight: 400;
     transition: border-color 0.15s ease;
@@ -303,7 +303,7 @@ body {
 }
 
 .btn-tertiary {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.65rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -340,7 +340,7 @@ body {
 }
 
 .game-header h2 {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 0.7rem;
     font-weight: 500;
     letter-spacing: 0.2em;
@@ -543,5 +543,252 @@ body {
         bottom: 1rem;
         right: 1rem;
         left: 1rem;
+    }
+}
+
+/* ─── Quiz Card (Question Screen) ─────────────────── */
+
+.game-playing {
+    display: flex;
+    justify-content: center;
+}
+
+.quiz-card {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-align: left;
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.quiz-card__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.quiz-card__badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 0.15rem 0.7rem;
+    line-height: 1.3;
+}
+
+.quiz-card__progress {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* Image / media area */
+.quiz-card__media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quiz-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.quiz-card__image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    color: var(--muted);
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(45deg, var(--surface) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--surface) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--surface) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--surface) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+.quiz-card__image-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+}
+
+.quiz-card__image-hint {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+/* Question text */
+.quiz-card__question {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+    padding: 1.5rem 1.5rem 0.5rem;
+}
+
+/* Answer area */
+.quiz-card__answer {
+    padding: 0.5rem 1.5rem 1.75rem;
+}
+
+.quiz-card__label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+}
+
+.quiz-card__input-row {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.quiz-card__input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.85rem 1rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.quiz-card__input::placeholder {
+    color: var(--muted);
+}
+
+.quiz-card__input:focus {
+    border-color: var(--accent);
+}
+
+.quiz-card__input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.quiz-card__submit {
+    background: var(--accent);
+    color: var(--bg);
+    border: 1px solid var(--accent);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.quiz-card__submit:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.quiz-card__submit:disabled {
+    background: transparent;
+    color: var(--muted);
+    border-color: var(--border);
+    cursor: not-allowed;
+}
+
+/* Result feedback */
+.quiz-card__result {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+}
+
+.quiz-card__result.is-correct {
+    border-left: 3px solid var(--success);
+    color: var(--text);
+}
+
+.quiz-card__result.is-incorrect {
+    border-left: 3px solid var(--error);
+    color: var(--text);
+}
+
+.quiz-card__result-icon {
+    font-size: 1rem;
+}
+
+.quiz-card__next {
+    display: block;
+    width: 100%;
+    margin-top: 1.25rem;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.quiz-card__next:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Transitions */
+.result-fade-enter-active,
+.button-fade-enter-active {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.result-fade-enter-from,
+.button-fade-enter-from {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+@media (max-width: 480px) {
+    .quiz-card__question {
+        font-size: 1rem;
+        padding: 1.25rem 1.1rem 0.5rem;
+    }
+
+    .quiz-card__answer {
+        padding: 0.5rem 1.1rem 1.5rem;
+    }
+
+    .quiz-card__input-row {
+        flex-direction: column;
+    }
+
+    .quiz-card__submit {
+        padding: 0.85rem;
     }
 }

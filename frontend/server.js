@@ -6,6 +6,9 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const BACKEND_URL = process.env.BACKEND_URL || 'http://127.0.0.1:8080';
+
+app.use(express.json());
 
 // Serve static files from current directory
 app.use(express.static(__dirname));
@@ -138,6 +141,27 @@ app.get('/api/dev-info', (req, res) => {
             'components/*.js'
         ]
     });
+});
+
+// Development proxy for host-game creation API.
+app.post('/games', async (req, res) => {
+    try {
+        const upstream = await fetch(`${BACKEND_URL}/games`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req.body || {})
+        });
+
+        const payload = await upstream.text();
+        res.status(upstream.status);
+        res.set('Content-Type', upstream.headers.get('content-type') || 'application/json');
+        res.send(payload);
+    } catch (error) {
+        console.error('❌ /games proxy error:', error);
+        res.status(502).json({ error: 'Failed to reach backend /games endpoint' });
+    }
 });
 
 // Start the server

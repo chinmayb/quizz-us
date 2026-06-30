@@ -290,6 +290,32 @@
                 },
                 
                 // Game Methods
+                async createGameLobby(gameData) {
+                    const requestPayload = {
+                        gameKindId: gameData.gameKindId || 'quiz',
+                        hostId: this.playerId,
+                        hostName: gameData.playerName,
+                        categories: gameData.categories || [],
+                        questionDuration: `${Math.max(5, Number(gameData.questionDurationSeconds) || 30)}s`,
+                        targetScore: Math.max(1, Number(gameData.targetScore) || 10)
+                    };
+
+                    const response = await fetch('/games', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestPayload)
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || `Create game failed with status ${response.status}`);
+                    }
+
+                    return response.json();
+                },
+
                 sendGamePlayAction(action, data = {}) {
                     if (!this.isConnected || !this.websocket) {
                         console.warn('WebSocket not connected, cannot send action:', action);
@@ -345,6 +371,7 @@
                             id: command.id,
                             question: command.question,
                             questionTime: command.question_time,
+                            image: command.image_src || '', // Optional image URL from backend
                             correctAnswer: command.correct_answer // Backend sends this; will hide in UI
                         };
                         
@@ -423,11 +450,26 @@
                     }, 10000);
                 },
 
-                handleHostGame(gameData) {
+                async handleHostGame(gameData) {
                     this.isHosting = true;
                     this.playerName = gameData.playerName;
-                    this.gameCode = gameData.gameCode;
                     this.isHost = true; // Mark this user as the host
+
+                    if (!this.playerId) {
+                        this.playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+                    }
+
+                    let createGameResponse;
+                    try {
+                        this.showToast('info', 'Creating game lobby...', 'ℹ️');
+                        createGameResponse = await this.createGameLobby(gameData);
+                        this.gameCode = createGameResponse.code;
+                    } catch (error) {
+                        console.error('Create game failed:', error);
+                        this.isHosting = false;
+                        this.showToast('error', 'Could not create game. Please try again.', '❌');
+                        return;
+                    }
 
                     // Establish WebSocket connection first
                     this.showToast('info', 'Connecting to server...', 'ℹ️');
@@ -452,7 +494,7 @@
                             // Update URL with game code
                             this.updateUrlWithGameCode(this.gameCode);
 
-                            this.showToast('success', `Hosting game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
+                            this.showToast('success', `Hosting ${createGameResponse.game?.gameKindId || 'quiz'} game ${this.gameCode}. Click "Start Game" when ready!`, '🎉');
                         }
                     }, 100); // Check every 100ms
                     

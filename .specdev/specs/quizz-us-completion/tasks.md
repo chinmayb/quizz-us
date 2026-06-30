@@ -6,7 +6,7 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
 
 ### Phase 1: Core Communication Layer
 
-- [] 1. Fix WebSocket-to-gRPC message serialization
+- [x] 1. Fix WebSocket-to-gRPC message serialization
   - Create JSON struct types that map to protobuf GamePlay messages (GamePlayAction, GamePlayCommand, GameSummary)
   - Implement JSON unmarshaling in ws.go to parse incoming WebSocket messages
   - Implement protobuf-to-JSON marshaling for outgoing messages
@@ -15,7 +15,7 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
   - Write unit tests for JSON/Protobuf conversion functions
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2. Implement game code generation utility
+- [x] 2. Implement game code generation utility
   - Create `GenerateGameCode()` function using crypto/rand for secure random generation
   - Implement 6-character alphanumeric code format (A-Z, 0-9)
   - Add uniqueness check against GameRegistry
@@ -31,7 +31,7 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
 
 ### Phase 2: Game Creation and Hosting
 
-- [ ] 3. Add game creation endpoint
+- [x] 3. Add game creation endpoint
   - Define CreateGameRequest and CreateGameResponse protobuf messages
   - Add CreateGame RPC method to Games service in quizz-us.proto
   - Regenerate protobuf code using make/buf
@@ -40,7 +40,7 @@ This implementation plan provides a comprehensive, ordered list of tasks to comp
   - Return game code and metadata to client
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 4. Extend Game struct with new fields
+- [x] 4. Extend Game struct with new fields
   - Add `status` field (GameStatus enum: NOT_STARTED, IN_PROGRESS, FINISHED)
   - Add `hostID` field to track game host
   - Add `settings` field (GameSettings struct) for categories, duration, target score

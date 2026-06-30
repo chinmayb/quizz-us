@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Games_Play_FullMethodName = "/api.Games/Play"
+	Games_CreateGame_FullMethodName = "/api.Games/CreateGame"
+	Games_Play_FullMethodName       = "/api.Games/Play"
 )
 
 // GamesClient is the client API for Games service.
@@ -28,6 +29,8 @@ const (
 //
 // Interface exported by the game server.
 type GamesClient interface {
+	// Create a game lobby and return a generated code.
+	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error)
 	// A Bidirectional streaming gameplay.
 	//
 	// Accepts a stream of GamePlay while a game is being played,
@@ -41,6 +44,16 @@ type gamesClient struct {
 
 func NewGamesClient(cc grpc.ClientConnInterface) GamesClient {
 	return &gamesClient{cc}
+}
+
+func (c *gamesClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateGameResponse)
+	err := c.cc.Invoke(ctx, Games_CreateGame_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gamesClient) Play(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[GamePlay, GamePlay], error) {
@@ -62,6 +75,8 @@ type Games_PlayClient = grpc.BidiStreamingClient[GamePlay, GamePlay]
 //
 // Interface exported by the game server.
 type GamesServer interface {
+	// Create a game lobby and return a generated code.
+	CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error)
 	// A Bidirectional streaming gameplay.
 	//
 	// Accepts a stream of GamePlay while a game is being played,
@@ -77,6 +92,9 @@ type GamesServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGamesServer struct{}
 
+func (UnimplementedGamesServer) CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
+}
 func (UnimplementedGamesServer) Play(grpc.BidiStreamingServer[GamePlay, GamePlay]) error {
 	return status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
@@ -101,6 +119,24 @@ func RegisterGamesServer(s grpc.ServiceRegistrar, srv GamesServer) {
 	s.RegisterService(&Games_ServiceDesc, srv)
 }
 
+func _Games_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GamesServer).CreateGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Games_CreateGame_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GamesServer).CreateGame(ctx, req.(*CreateGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Games_Play_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(GamesServer).Play(&grpc.GenericServerStream[GamePlay, GamePlay]{ServerStream: stream})
 }
@@ -114,7 +150,12 @@ type Games_PlayServer = grpc.BidiStreamingServer[GamePlay, GamePlay]
 var Games_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "api.Games",
 	HandlerType: (*GamesServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateGame",
+			Handler:    _Games_CreateGame_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Play",
